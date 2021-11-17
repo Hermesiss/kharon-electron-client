@@ -16,7 +16,7 @@
               </v-list-item-title>
             </v-list-item-content>
           </v-list-item>
-          <v-list-item @click="checkUpdate">
+          <v-list-item :disabled="!updateButtonState" @click="checkUpdate">
             <v-list-item-content>
               <v-list-item-title class="text-h6">
                 CheckForUpdate
@@ -47,6 +47,9 @@
         </v-list>
       </v-navigation-drawer>
       <nuxt/>
+      <v-footer v-if="showDownloadState" fixed app>
+        <v-progress-linear v-model="updateProgress"/>
+      </v-footer>
     </v-main>
   </v-app>
 </template>
@@ -63,7 +66,10 @@ export default {
   components: {},
   data() {
     return {
-      drawer: false
+      drawer: false,
+      updateButtonState: true,
+      updateProgress: 0,
+      showDownloadState: false
     }
   },
   computed: {
@@ -81,10 +87,21 @@ export default {
       }
     },
     checkUpdate() {
-      // checkForUpdates()
-      const { ipcRenderer } = require('electron')
-      const resp = ipcRenderer.sendSync('check-update', 'argument')
-      console.log('RESP', resp)
+      this.setButtonState(false)
+      ipcRenderer.on('downloadProgress', (_, progress) => this.setProgress(progress))
+      ipcRenderer.on('downloadState', (_, state) => this.showDownload(state))
+
+      ipcRenderer.invoke('check-update', '')
+        .then(() => this.setButtonState(true))
+    },
+    setButtonState(mode) {
+      this.updateButtonState = mode
+    },
+    setProgress(percent) {
+      this.updateProgress = percent
+    },
+    showDownload(mode) {
+      this.showDownloadState = mode
     }
   }
 }

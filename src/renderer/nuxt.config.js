@@ -32,7 +32,7 @@ module.exports = {
   ssr: false,
   target: 'static',
   head: {
-    title: 'kharon-electron-client',
+    title: 'Kharon launcher',
     meta: [{charset: 'utf-8'}]
   },
   loading: false,
