@@ -15,9 +15,10 @@ const isDev = require('electron-is-dev')
 const {autoUpdater} = require('electron-updater')
 
 autoUpdater.autoDownload = false
+autoUpdater.allowDowngrade = true
+
 if (isDev) {
-  console.log(__dirname)
-  autoUpdater.updateConfigPath = 'publish/win-unpacked/resources/app-update.yml'
+  autoUpdater.updateConfigPath = 'dist/publish/win-unpacked/resources/app-update.yml'
 }
 
 autoUpdater.on('error', error => {
@@ -54,6 +55,10 @@ autoUpdater.on('update-downloaded', () => {
   }).then(() => {
     setImmediate(() => autoUpdater.quitAndInstall())
   })
+})
+
+autoUpdater.on('download-progress', progressObj => {
+  console.log('Downloaded: ' + Math.floor(progressObj.percent) + '%')
 })
 
 // export this to MenuItem click callback

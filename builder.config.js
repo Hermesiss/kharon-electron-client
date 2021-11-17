@@ -16,7 +16,8 @@ const windowsOS = {
         private: false,
         releaseType: 'release',
         token: process.env.GH_TOKEN,
-        publisherName: ['hermesiss']
+        publisherName: [],
+        verifyUpdateCodeSignature: false
       }
     ]
   },
@@ -58,9 +59,11 @@ const macOS = {
 }
 
 module.exports = {
-  productName: 'kharon-electron-client',
+  productName: 'Kharon',
   appId: 'com.kharon.client',
+  // eslint-disable-next-line no-template-curly-in-string
   artifactName: 'setup-${version}.${ext}',
+  afterPack: '.electron-nuxt/remove-publishers.js',
   directories: {
     output: 'dist/publish'
   },
