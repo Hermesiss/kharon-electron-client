@@ -1,6 +1,6 @@
 const ICONS_DIR = 'build/icons/'
 
-require('dotenv').config();
+require('dotenv').config()
 
 const windowsOS = {
   win: {
@@ -15,7 +15,8 @@ const windowsOS = {
         owner: 'hermesiss',
         private: false,
         releaseType: 'release',
-        token: process.env.GH_TOKEN
+        token: process.env.GH_TOKEN,
+        publisherName: ['hermesiss']
       }
     ]
   },
@@ -61,7 +62,7 @@ module.exports = {
   appId: 'com.kharon.client',
   artifactName: 'setup-${version}.${ext}',
   directories: {
-    output: 'publish'
+    output: 'dist/publish'
   },
   // default files: https://www.electron.build/configuration/contents
   files: [
