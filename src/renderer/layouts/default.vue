@@ -16,6 +16,13 @@
               </v-list-item-title>
             </v-list-item-content>
           </v-list-item>
+          <v-list-item @click="checkUpdate">
+            <v-list-item-content>
+              <v-list-item-title class="text-h6">
+                CheckForUpdate
+              </v-list-item-title>
+            </v-list-item-content>
+          </v-list-item>
           <v-list-item to="/protected">
             <v-list-item-content>
               <v-list-item-title class="text-h6">
@@ -45,6 +52,12 @@
 </template>
 
 <script>
+/* const { autoUpdater } = require('electron-updater')
+autoUpdater.autoDownload = false */
+
+// import {checkForUpdates} from '../../main/updater'
+
+import {ipcRenderer} from 'electron'
 
 export default {
   components: {},
@@ -66,6 +79,12 @@ export default {
       } catch (err) {
         console.log(err)
       }
+    },
+    checkUpdate() {
+      // checkForUpdates()
+      const { ipcRenderer } = require('electron')
+      const resp = ipcRenderer.sendSync('check-update', 'argument')
+      console.log('RESP', resp)
     }
   }
 }

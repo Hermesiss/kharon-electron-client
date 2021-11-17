@@ -1,4 +1,11 @@
-import { app } from 'electron'
+import { app, ipcMain} from 'electron'
+import {checkForUpdates} from './updater'
+
+ipcMain.on('check-update', (event, args) => {
+  console.log(event, args)
+  checkForUpdates()
+  event.returnValue = true
+})
 
 // Quit when all windows are closed.
 app.on('window-all-closed', function () {
