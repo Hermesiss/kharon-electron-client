@@ -9,7 +9,6 @@
 import {remote} from 'electron'
 
 export default {
-  auth: false,
   components: {},
   data() {
     return {

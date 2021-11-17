@@ -1,5 +1,5 @@
 const {app, ipcMain} = require('electron')
-const {checkForUpdates} = require('./updater')
+const {checkForUpdates, download, install} = require('./updater')
 
 // Quit when all windows are closed.
 app.on('window-all-closed', function () {
@@ -12,12 +12,22 @@ app.on('window-all-closed', function () {
 require('./mainWindow')
 
 ipcMain.handle('check-update', async () => {
+  return await checkForUpdates(
+    result => console.log('Fetched with result', result))
+})
+
+ipcMain.handle('download-update', async () => {
   const webContents = require('electron').webContents.getFocusedWebContents()
-  console.log(webContents)
-  await checkForUpdates(
-    result => console.log('Fetched with result', result),
+  return await download(
     progress => webContents.send('downloadProgress', progress),
     () => webContents.send('downloadState', true),
-    () => webContents.send('downloadState', false),
+    () => {
+      webContents.send('downloadState', false)
+      webContents.send('canUpdate')
+    },
   )
+})
+
+ipcMain.handle('install-update', async () => {
+  return install()
 })

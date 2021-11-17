@@ -1,31 +1,31 @@
 <template>
-  <div>
-    <v-container>
-      <v-row>
-        <v-col
-          cols="12"
-          md="12"
-        >
-          <h1>Please, login</h1>
-          <v-form @submit.prevent="userLogin">
-            <v-text-field
-              v-model="login.username"
-              label="Username"
-              type="text"
-            />
+  <v-container fill-height>
+    <v-row align="center"
+           justify="center"
+    >
+      <v-col
+        cols="12"
+        md="6"
+      >
+        <h1>Please, login</h1>
+        <v-form @submit.prevent="userLogin">
+          <v-text-field
+            v-model="login.username"
+            label="Username"
+            type="text"
+          />
 
-            <v-text-field
-              v-model="login.password"
-              label="Password"
-              type="password"
-            />
+          <v-text-field
+            v-model="login.password"
+            label="Password"
+            type="password"
+          />
 
-            <v-btn type="submit">Submit</v-btn>
-          </v-form>
-        </v-col>
-      </v-row>
-    </v-container>
-  </div>
+          <v-btn type="submit">Submit</v-btn>
+        </v-form>
+      </v-col>
+    </v-row>
+  </v-container>
 </template>
 
 <script>

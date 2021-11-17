@@ -53,6 +53,8 @@ module.exports = {
       : process.env.RELEASE_URL
   },
   vuetify: {
+    customVariables: ['~/assets/variables.scss'],
+    treeShake: true,
     theme: {
       themes: {
         light: {
