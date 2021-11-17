@@ -6,7 +6,8 @@
       </v-app-bar>
       <v-navigation-drawer
         v-model="drawer"
-        absolute>
+        absolute
+      >
         <v-list>
           <v-list-item to="/">
             <v-list-item-content>
@@ -44,10 +45,9 @@
 </template>
 
 <script>
-import appHeader from '@/components/header'
 
 export default {
-  components: {appHeader},
+  components: {},
   data() {
     return {
       drawer: false

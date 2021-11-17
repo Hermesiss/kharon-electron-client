@@ -11,6 +11,8 @@ const resourcesPath = require('./resources-path-provider')
 const { DIST_DIR, MAIN_PROCESS_DIR, SERVER_HOST, SERVER_PORT } = require('./config')
 const NuxtApp = require('./renderer/NuxtApp')
 
+require('dotenv').config()
+
 const isDev = process.env.NODE_ENV === 'development'
 
 const electronLogger = new Logger('Electron', 'teal')

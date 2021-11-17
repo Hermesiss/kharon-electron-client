@@ -4,6 +4,8 @@
  * @link {https://nuxtjs.org/guide/configuration/}
  */
 
+require('dotenv').config()
+
 module.exports = {
   router: {middleware: ['auth']},
   auth: {
@@ -45,6 +47,11 @@ module.exports = {
     '@nuxtjs/axios',
     '@nuxtjs/auth-next'
   ],
+  axios: {
+    baseURL: process.env.NODE_ENV === 'development'
+      ? process.env.DEBUG_URL
+      : process.env.RELEASE_URL
+  },
   vuetify: {
     theme: {
       themes: {

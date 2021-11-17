@@ -1,10 +1,23 @@
 const ICONS_DIR = 'build/icons/'
 
+require('dotenv').config();
+
 const windowsOS = {
   win: {
     icon: ICONS_DIR + 'win-icon.ico',
-    publisherName: 'michal',
-    target: 'nsis'
+    publisherName: 'hermesis',
+    target: 'nsis',
+    requestedExecutionLevel: 'highestAvailable',
+    publish: [
+      {
+        provider: 'github',
+        repo: 'kharon-electron-client',
+        owner: 'hermesiss',
+        private: false,
+        releaseType: 'release',
+        token: process.env.GH_TOKEN
+      }
+    ]
   },
 
   nsis: {
@@ -12,6 +25,7 @@ const windowsOS = {
   }
 }
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const linuxOS = {
   linux: {
     icon: ICONS_DIR,
@@ -19,6 +33,7 @@ const linuxOS = {
   }
 }
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const macOS = {
   mac: {
     target: 'dmg',
@@ -46,7 +61,7 @@ module.exports = {
   appId: 'com.kharon.client',
   artifactName: 'setup-${version}.${ext}',
   directories: {
-    output: 'build'
+    output: 'publish'
   },
   // default files: https://www.electron.build/configuration/contents
   files: [
@@ -67,6 +82,6 @@ module.exports = {
     }
   ],
   ...windowsOS,
-  ...linuxOS,
-  ...macOS
+  // ...linuxOS,
+  // ...macOS
 }

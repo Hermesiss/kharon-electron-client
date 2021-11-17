@@ -1,6 +1,6 @@
 {
   "name": "kharon-electron-client",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Kharon game and app launcher",
   "main": "./dist/main/index.js",
   "scripts": {
@@ -12,12 +12,13 @@
     "lint": "node_modules/.bin/eslint --ext .js,.vue,.ts -f ./node_modules/eslint-friendly-formatter ./src",
     "lint:fix": "yarn run lint -- --fix",
     "preinstall": "node .electron-nuxt/check-engines.js",
-    "postinstall": "electron-builder install-app-deps & yarn run lint:fix"
+    "postinstall": "electron-builder install-app-deps & yarn run lint:fix",
+    "publish": "node .electron-nuxt/build.js --publish always"
   },
   "keywords": [],
   "author": "Hermesis <hermesiss@gmail.com>",
   "license": "MIT",
-  "homepage": "https://github.com/michalzaq12/electron-nuxt/blob/master/README.md",
+  "homepage": "https://github.com/Hermesiss/kharon-electron-client",
   "engines": {
     "node": ">=12.13.0"
   },
@@ -59,6 +60,8 @@
   },
   "dependencies": {
     "@nuxtjs/auth-next": "5.0.0-1624817847.21691f1",
-    "@nuxtjs/axios": "^5.13.6"
+    "@nuxtjs/axios": "^5.13.6",
+    "dotenv": "^10.0.0",
+    "electron-updater": "^4.3.9"
   }
 }
