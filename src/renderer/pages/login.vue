@@ -42,11 +42,10 @@ export default {
   methods: {
     async userLogin() {
       try {
-        const response = await this.$auth.loginWith('local', {data: this.login})
-        console.log(response)
+        await this.$auth.loginWith('local', {data: this.login})
         await this.$router.push('/')
       } catch (err) {
-        console.log(err)
+        console.error(err)
       }
     }
   }

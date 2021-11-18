@@ -1,13 +1,14 @@
 import semver from 'semver'
-import {app, remote} from 'electron'
-
-console.log('GET VERSION INSIDE DOWNLOAD', app?.getVersion(), remote?.app?.getVersion())
+import {UpdateState} from '~/plugins/types'
 
 export const state = () => ({
-  installedVersion: localStorage.getItem('installedVersion'),
+  installedVersion: '0.0.1', // localStorage.getItem('installedVersion'),
   availableVersion: '0.0.1', // localStorage.getItem('availableVersion'),
-  downloadedVersion: localStorage.getItem('downloadedVersion'),
-  downloadSize: 0
+  downloadedVersion: localStorage.getItem('downloadedVersion') || '0.0.1',
+  downloadSize: 0,
+  downloadProgress: 0,
+  isFetching: false,
+  isDownloading: false
 })
 
 export const mutations = {
@@ -34,6 +35,15 @@ export const mutations = {
   },
   setDownloadedVersionAsAvailable(state) {
     state.downloadedVersion = state.availableVersion
+  },
+  setFetching(state, mode) {
+    state.isFetching = mode
+  },
+  setDownloading(state, mode) {
+    state.isDownloading = mode
+  },
+  setDownloadProgress(state, progress) {
+    state.downloadProgress = progress
   }
 }
 
@@ -56,5 +66,19 @@ export const getters = {
   isPending: state => {
     return semver.lt(state.installedVersion, state.downloadedVersion) &&
       semver.gte(state.downloadedVersion, state.availableVersion)
+  },
+  currentUpdateState: (state, getters) => {
+    if (state.isFetching) return UpdateState.Fetching
+    if (state.isDownloading) return UpdateState.Downloading
+    if (getters.isPending) return UpdateState.CanInstall
+    if (!getters.isActual) {
+      return UpdateState.NewAvailable
+    }
+    return UpdateState.Actual
+  },
+  downloadedBytes: state => {
+    const bytes = parseFloat(state.downloadSize / (100 - state.downloadProgress))
+    if (isFinite(bytes)) return bytes
+    return 0
   }
 }

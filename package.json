@@ -1,6 +1,6 @@
 {
   "name": "kharon-electron-client",
-  "version": "0.0.7",
+  "version": "0.0.8",
   "description": "Kharon game and app launcher",
   "main": "./dist/main/index.js",
   "scripts": {
@@ -67,6 +67,7 @@
     "electron-updater": "^4.3.9",
     "humanize": "^0.0.9",
     "js-yaml": "^4.1.0",
-    "semver": "^7.3.5"
+    "semver": "^7.3.5",
+    "vuex": "^3.6.2"
   }
 }

@@ -20,7 +20,7 @@
                 </v-list-item-title>
               </v-list-item-content>
             </v-list-item>
-            <v-list-item>
+            <v-list-item to="/protected">
               <v-list-item-content>
                 <v-list-item-title class="text-h6">
                   Protected
@@ -73,7 +73,6 @@ export default {
       return this.$vuetify.breakpoint.mdAndUp
     },
     username() {
-      console.log(this.$store.state)
       const user = this.$store.state.auth?.user
 
       return user ? (user.company ? user.company + ':' : '') + user.firstName : ''
@@ -82,10 +81,9 @@ export default {
   methods: {
     async logout() {
       try {
-        const response = await this.$auth.logout('local')
-        console.log(response)
+        await this.$auth.logout('local')
       } catch (err) {
-        console.log(err)
+        console.error(err)
       }
     },
 

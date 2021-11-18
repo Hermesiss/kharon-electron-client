@@ -11,6 +11,8 @@ app.on('window-all-closed', function () {
 // Load here all startup windows
 require('./mainWindow')
 
+ipcMain.handle('get-version', () => app.getVersion())
+
 ipcMain.handle('check-update', async () => {
   return await checkForUpdates(
     result => console.log('Fetched with result', result))
