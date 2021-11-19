@@ -1,0 +1,11 @@
+{
+  "common": {
+    "helloWorld": "Hello, World",
+    "submit": "Submit"
+  },
+  "login": {
+    "caption": "Please, login",
+    "password": "Password",
+    "username": "Username"
+  }
+}

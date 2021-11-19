@@ -1,6 +1,6 @@
 <template>
   <div>
-    <h1>Hello world!</h1>
+    <h1>{{ $t('common.helloWorld') }}</h1>
     <NuxtLink to="login">LOGIN</NuxtLink>
   </div>
 </template>
@@ -12,13 +12,6 @@ export default {
   components: {},
   data() {
     return {
-      externalContent: '',
-      items: [
-        {title: 'Dashboard', icon: 'mdi-view-dashboard'},
-        {title: 'Photos', icon: 'mdi-image'},
-        {title: 'About', icon: 'mdi-help-box'},
-      ],
-      right: null,
     }
   },
   methods: {

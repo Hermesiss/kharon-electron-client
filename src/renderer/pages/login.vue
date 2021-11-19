@@ -7,21 +7,22 @@
         cols="12"
         md="6"
       >
-        <h1>Please, login</h1>
+
+        <h1>{{ $t('login.caption') }}</h1>
         <v-form @submit.prevent="userLogin">
           <v-text-field
             v-model="login.username"
-            label="Username"
+            :label="$t('login.username')"
             type="text"
           />
 
           <v-text-field
             v-model="login.password"
-            label="Password"
+            :label="$t('login.password')"
             type="password"
           />
 
-          <v-btn type="submit">Submit</v-btn>
+          <v-btn type="submit">{{ $t('common.submit') }}</v-btn>
         </v-form>
       </v-col>
     </v-row>

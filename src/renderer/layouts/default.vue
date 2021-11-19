@@ -10,9 +10,11 @@
                            app
                            class="pa-0"
       >
-        <v-layout column fill-height class="overflow-y-hidden" >
-          <v-toolbar-title class="text-center py-2">Hello, {{ username }}</v-toolbar-title>
-          <v-list >
+        <v-layout column fill-height class="overflow-y-hidden">
+          <v-toolbar-title class="text-center py-2">
+            Hello, {{ username }}
+          </v-toolbar-title>
+          <v-list>
             <v-list-item to="/">
               <v-list-item-content>
                 <v-list-item-title class="text-h6">
@@ -20,13 +22,9 @@
                 </v-list-item-title>
               </v-list-item-content>
             </v-list-item>
-            <v-list-item to="/protected">
-              <v-list-item-content>
-                <v-list-item-title class="text-h6">
-                  Protected
-                </v-list-item-title>
-              </v-list-item-content>
-            </v-list-item>
+          </v-list>
+          <v-spacer/>
+          <v-list>
             <v-list-item v-if="isLogged" @click="logout">
               <v-list-item-content>
                 <v-list-item-title class="text-h6">
@@ -34,15 +32,25 @@
                 </v-list-item-title>
               </v-list-item-content>
             </v-list-item>
-            <v-list-item v-else to="/login">
+            <v-list-item v-else to="login">
               <v-list-item-content>
                 <v-list-item-title class="text-h6">
                   Log in
                 </v-list-item-title>
               </v-list-item-content>
             </v-list-item>
+            <v-list-item v-for="locale in availableLocales" :key="locale.code"
+                         :disabled="!locale.available"
+                         :inactive="!locale.available"
+                         @click.prevent.stop="$i18n.setLocale(locale.code)"
+            >
+              <v-list-item-content>
+                <v-list-item-title class="text-h6">
+                  {{ locale.name }}
+                </v-list-item-title>
+              </v-list-item-content>
+            </v-list-item>
           </v-list>
-          <v-spacer/>
           <update-checker/>
         </v-layout>
       </v-navigation-drawer>
@@ -76,6 +84,12 @@ export default {
       const user = this.$store.state.auth?.user
 
       return user ? (user.company ? user.company + ':' : '') + user.firstName : ''
+    },
+    availableLocales() {
+      return this.$i18n.locales.map(i => {
+        i.available = (i.code !== this.$i18n.locale)
+        return i
+      })
     }
   },
   methods: {

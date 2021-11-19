@@ -45,8 +45,24 @@ module.exports = {
   modules: [
     '@nuxtjs/vuetify',
     '@nuxtjs/axios',
-    '@nuxtjs/auth-next'
+    '@nuxtjs/auth-next',
+    '@nuxtjs/i18n',
   ],
+  i18n: {
+    locales: [
+      {code: 'en', iso: 'en-US', file: 'en.json', name: 'English'},
+      {code: 'ru', iso: 'ru-RU', file: 'ru.json', name: 'Русский'}
+    ],
+    langDir: 'languages/',
+    defaultLocale: 'en',
+    detectBrowserLanguage: {
+      alwaysRedirect: false,
+      fallbackLocale: 'en',
+      redirectOn: 'all',
+    },
+    vuex: {moduleName: 'i18n', syncRouteParams: true},
+    strategy: 'no_prefix'
+  },
   axios: {
     baseURL: process.env.NODE_ENV === 'development'
       ? process.env.DEBUG_URL
