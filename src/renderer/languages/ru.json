@@ -1,8 +1,23 @@
 {
+  "apps": {
+    "editor": {
+      "appCode": "Код приложения",
+      "appName": "Имя приложения",
+      "rootPath": "Корневая папка",
+      "title": {
+        "create": "Создать приложение",
+        "edit": "Редактировать приложение"
+      }
+    },
+    "title": "Приложения"
+  },
   "common": {
     "delete": "Удалить",
     "discard": "Отказаться",
     "helloWorld": "Привет, мир",
+    "rules": {
+      "required": "Необходимо"
+    },
     "save": "Сохранить",
     "submit": "Подтвердить"
   },
@@ -10,6 +25,7 @@
     "title": "Компании"
   },
   "company": {
+    "company": "Компания",
     "editor": {
       "companyName": "Имя",
       "companyPrefix": "Префикс",

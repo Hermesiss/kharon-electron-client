@@ -7,7 +7,6 @@
         cols="12"
         md="6"
       >
-
         <h1>{{ $t('login.caption') }}</h1>
         <v-form @submit.prevent="userLogin">
           <v-text-field

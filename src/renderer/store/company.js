@@ -17,15 +17,24 @@ export const getters = {
     return state.companies.find(c => c.id === id)
   },
   getSelectedCompany: (state, getters, rootState, rootGetters) => {
-    const role = rootGetters['auth.currentUserRole']
-    const isAdmin = role === 'admin'
+    const isAdmin = rootGetters['user/isAdmin']
+    console.log('IS ADMIN', isAdmin)
     return isAdmin ? state.selectedCompany : getters.getCompanyById(rootGetters['auth.currentUser']?.company)
   },
 }
 
 export const actions = {
+  async selectCompany(state, company) {
+    state.commit('setSelectedCompany', company)
+    if (company?.apps) { await state.dispatch('app/fetchApps', company.apps, {root: true}) }
+  },
   async fetchCompanies(state) {
-    state.commit('setCompanies', await this.$axios.$get('/companies/'))
+    const companies = await this.$axios.$get('/companies/')
+    state.commit('setCompanies', companies)
+    const getter = state.getters.getSelectedCompany
+    console.log(state.getters)
+    console.log('GETTER', getter)
+    await state.dispatch('selectCompany', companies.find(x => x.id === getter?.id))
   },
   /* {
         "companyName": String,
@@ -34,9 +43,6 @@ export const actions = {
   async createCompany(state, company) {
     const resp = await this.$axios.$post('/companies/create', company)
     await state.dispatch('fetchCompanies')
-    /* if (resp.error) {
-      throw new Error(resp.error)
-    } */
     return resp.data
   },
   /* {
@@ -52,9 +58,6 @@ export const actions = {
   async deleteCompany(state, companyId) {
     const resp = await this.$axios.$delete(`/companies/${companyId}`)
     await state.dispatch('fetchCompanies')
-    /* if (resp.error) {
-      throw new Error(resp.error)
-    } */
     return resp.data
   },
 }

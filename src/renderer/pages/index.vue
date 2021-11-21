@@ -6,6 +6,9 @@
       <v-col v-if="isAdmin" cols="4" class="fill-height">
         <companies fill-height/>
       </v-col>
+      <v-col v-if="getSelectedCompany" cols="6" class="fill-height">
+        <apps fill-height/>
+      </v-col>
     </v-row>
   </v-container>
 </template>
@@ -14,19 +17,21 @@
 import {remote} from 'electron'
 import {mapGetters} from 'vuex'
 import Companies from '../components/companies'
+import Apps from '../components/apps'
 
 export default {
-  components: { Companies},
+  components: {Apps, Companies},
   data() {
     return {}
   },
   computed: {
     ...mapGetters({
-      isAdmin: 'users/isAdmin'
+      isAdmin: 'user/isAdmin',
+      getSelectedCompany: 'company/getSelectedCompany'
     })
   },
   async mounted() {
-    await this.$store.dispatch('companies/fetchCompanies')
+    await this.$store.dispatch('company/fetchCompanies')
   },
   methods: {
     openURL(url) {

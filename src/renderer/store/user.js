@@ -15,7 +15,6 @@ export const getters = {
     return rootState.auth.user
   },
   currentUserRole: (state, getters) => {
-    console.log('GETTERS', getters)
     return getters.currentUser?.role
   },
   isOwner: (state, getters) => {

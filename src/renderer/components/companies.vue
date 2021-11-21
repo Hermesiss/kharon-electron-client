@@ -3,13 +3,16 @@
     <v-card-title>
       {{ $t('companies.title') }}
       <v-flex/>
+      <v-btn icon @click="fetchCompanies()">
+        <v-icon>mdi-refresh</v-icon>
+      </v-btn>
       <v-btn icon @click="openEditDialogue(null)">
         <v-icon>mdi-plus</v-icon>
       </v-btn>
     </v-card-title>
     <v-list>
       <v-list-item-group
-        v-model="selected"
+        :value="selected"
         color="primary"
       >
         <v-list-item v-for="company in companies"
@@ -20,6 +23,7 @@
             <v-list-item-title>{{ company.companyName }}</v-list-item-title>
             <v-list-item-subtitle>[{{ company.companyPrefix }}]</v-list-item-subtitle>
           </v-list-item-content>
+          <v-list-item-avatar>{{ company.apps ? company.apps.length : '' }}</v-list-item-avatar>
           <v-list-item-action>
             <v-btn icon @click.prevent.stop="openEditDialogue(company)">
               <v-icon>mdi-pencil</v-icon>
@@ -35,18 +39,18 @@
       >
         <v-card>
           <v-card-title class="text-h5 grey lighten-2">
-            {{ companyId ? $t('company.editor.title.edit') : $t('company.editor.title.create') }}
+            {{ editedCompany.id ? $t('company.editor.title.edit') : $t('company.editor.title.create') }}
           </v-card-title>
 
           <v-card-text>
-            <v-text-field v-model="companyName" :label="$t('company.editor.companyName')"/>
-            <v-text-field v-model="companyPrefix" :label="$t('company.editor.companyPrefix')"/>
+            <v-text-field v-model="editedCompany.companyName" :label="$t('company.editor.companyName')"/>
+            <v-text-field v-model="editedCompany.companyPrefix" :label="$t('company.editor.companyPrefix')"/>
           </v-card-text>
 
           <v-divider/>
 
           <v-card-actions>
-            <v-btn v-if="companyId" color="error"
+            <v-btn v-if="editedCompany.id" color="error"
                    @click.prevent.stop="deleteCompanyPrompt() && (editDialogue = false)"
             >
               {{ $t('common.delete') }}
@@ -78,35 +82,36 @@ export default {
   name: 'Companies',
   data: () => ({
     editDialogue: false,
-    companyName: '',
-    companyPrefix: '',
-    companyId: null,
+    editedCompany: {
+      id: '',
+      companyName: '',
+      companyPrefix: '',
+      apps: []
+    },
   }),
   computed: {
     ...mapGetters({
-      userRole: 'users/currentUserRole',
+      userRole: 'user/currentUserRole',
     }),
     ...mapState({
-      companies: state => state.companies.companies,
-      selectedCompany: state => state.companies.selectedCompany
+      companies: state => state.company.companies,
+      selectedCompany: state => state.company.selectedCompany
     }),
     selected() {
-      return this.companies.indexOf(this.selectedCompany)
+      return this.companies.findIndex(x => x.id === this.selectedCompany?.id)
     }
   },
   methods: {
     ...mapActions({
-      createCompany: 'companies/createCompany',
-      updateCompany: 'companies/updateCompany',
-      deleteCompany: 'companies/deleteCompany',
+      createCompany: 'company/createCompany',
+      updateCompany: 'company/updateCompany',
+      deleteCompany: 'company/deleteCompany',
+      setSelectedCompany: 'company/selectCompany',
+      fetchCompanies: 'company/fetchCompanies'
     }),
-    ...mapMutations({
-      setSelectedCompany: 'companies/setSelectedCompany'
-    }),
+    ...mapMutations({}),
     openEditDialogue(company) {
-      this.companyName = company?.companyName
-      this.companyPrefix = company?.companyPrefix
-      this.companyId = company?.id
+      this.editedCompany = {...company}
       this.editDialogue = true
     },
     selectCompany(company) {
@@ -117,25 +122,20 @@ export default {
       this.setSelectedCompany(company)
     },
     saveCompany() {
-      console.log('SAVE COMPANY')
-      const company = {companyName: this.companyName, companyPrefix: this.companyPrefix}
-      if (this.companyId) {
-        company.id = this.companyId
-        this.updateCompany(company)
+      if (this.editedCompany.id) {
+        this.updateCompany(this.editedCompany)
       } else {
-        this.createCompany(company)
+        this.createCompany(this.editedCompany)
       }
     },
     deleteCompanyPrompt() {
-      if (confirm(`Are you sure you want to delete company ${this.companyName}?`)) {
-        this.deleteCompany(this.companyId)
+      if (confirm(`Are you sure you want to delete company "${this.editedCompany.companyName}"?`)) {
+        this.deleteCompany(this.editedCompany.id)
         return true
       }
 
       return false
     },
-    /* selectCompany(company) {
-     } */
   }
 }
 </script>

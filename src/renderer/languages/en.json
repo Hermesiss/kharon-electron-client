@@ -1,8 +1,23 @@
 {
+  "apps": {
+    "editor": {
+      "appCode": "App code",
+      "appName": "App name",
+      "rootPath": "Root path",
+      "title": {
+        "create": "Create app",
+        "edit": "Edit app"
+      }
+    },
+    "title": "Apps"
+  },
   "common": {
     "delete": "Delete",
     "discard": "Discard",
     "helloWorld": "Hello, World",
+    "rules": {
+      "required": "Required"
+    },
     "save": "Save",
     "submit": "Submit"
   },
@@ -10,6 +25,7 @@
     "title": "Companies"
   },
   "company": {
+    "company": "Company",
     "editor": {
       "companyName": "Name",
       "companyPrefix": "Prefix",
