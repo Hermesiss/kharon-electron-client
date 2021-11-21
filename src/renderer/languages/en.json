@@ -1,7 +1,23 @@
 {
   "common": {
+    "delete": "Delete",
+    "discard": "Discard",
     "helloWorld": "Hello, World",
+    "save": "Save",
     "submit": "Submit"
+  },
+  "companies": {
+    "title": "Companies"
+  },
+  "company": {
+    "editor": {
+      "companyName": "Name",
+      "companyPrefix": "Prefix",
+      "title": {
+        "create": "Create company",
+        "edit": "Edit company"
+      }
+    }
   },
   "login": {
     "caption": "Please, login",

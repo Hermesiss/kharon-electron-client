@@ -1,7 +1,7 @@
 <template>
   <v-app>
     <v-main>
-      <v-app-bar v-if="isLogged">
+      <v-app-bar v-if="isLogged" dense flat app>
         <v-app-bar-nav-icon v-if="!isNavPermanent" @click.stop="drawer = !drawer"/>
       </v-app-bar>
       <v-navigation-drawer v-if="isLogged"

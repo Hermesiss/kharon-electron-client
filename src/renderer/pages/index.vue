@@ -1,18 +1,32 @@
 <template>
-  <div>
-    <h1>{{ $t('common.helloWorld') }}</h1>
-    <NuxtLink to="login">LOGIN</NuxtLink>
-  </div>
+  <!--    <h1>{{ $t('common.helloWorld') }}</h1>
+  <NuxtLink to="login">LOGIN</NuxtLink>-->
+  <v-container fluid fill-height class="pa-0">
+    <v-row class="fill-height " dense no-gutters>
+      <v-col v-if="isAdmin" cols="4" class="fill-height">
+        <companies fill-height/>
+      </v-col>
+    </v-row>
+  </v-container>
 </template>
 
 <script>
 import {remote} from 'electron'
+import {mapGetters} from 'vuex'
+import Companies from '../components/companies'
 
 export default {
-  components: {},
+  components: { Companies},
   data() {
-    return {
-    }
+    return {}
+  },
+  computed: {
+    ...mapGetters({
+      isAdmin: 'users/isAdmin'
+    })
+  },
+  async mounted() {
+    await this.$store.dispatch('companies/fetchCompanies')
   },
   methods: {
     openURL(url) {

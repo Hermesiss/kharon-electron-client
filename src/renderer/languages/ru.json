@@ -1,7 +1,23 @@
 {
   "common": {
+    "delete": "Удалить",
+    "discard": "Отказаться",
     "helloWorld": "Привет, мир",
+    "save": "Сохранить",
     "submit": "Подтвердить"
+  },
+  "companies": {
+    "title": "Компании"
+  },
+  "company": {
+    "editor": {
+      "companyName": "Имя",
+      "companyPrefix": "Префикс",
+      "title": {
+        "create": "Создать компанию",
+        "edit": "Редактировать компанию"
+      }
+    }
   },
   "login": {
     "caption": "Пожалуйста, авторизуйтесь",
