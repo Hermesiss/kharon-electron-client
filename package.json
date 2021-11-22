@@ -1,6 +1,6 @@
 {
   "name": "kharon-electron-client",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Kharon game and app launcher",
   "main": "./dist/main/index.js",
   "scripts": {
@@ -69,6 +69,7 @@
     "electron-is-dev": "^2.0.0",
     "electron-store": "^8.0.1",
     "electron-updater": "^4.3.9",
+    "electron-window-state": "^5.0.3",
     "humanize": "^0.0.9",
     "js-yaml": "^4.1.0",
     "md5-file": "^5.0.0",

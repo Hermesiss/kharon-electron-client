@@ -35,6 +35,9 @@
       }
     }
   },
+  "debug": {
+    "title": "Debug"
+  },
   "home": {
     "title": "Home"
   },
@@ -44,7 +47,14 @@
     "username": "Username"
   },
   "settings": {
+    "admin": "Admin",
+    "ftp-password": "Ftp password",
+    "language": "Language",
     "logout": "Log out",
+    "management": "Management",
     "title": "Settings"
+  },
+  "users": {
+    "title": "Users"
   }
 }

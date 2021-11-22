@@ -3,8 +3,9 @@
     <v-list-item :disabled="!updateButtonState" :loading="fetching" :class="getButtonClass" @click="getButtonAction">
       <v-progress-linear v-model="downloadProgress" color="green"
                          absolute height="100%" striped :active="isDownloading"
+                         style="z-index: 1"
       />
-      <v-list-item-content style="z-index: 100">
+      <v-list-item-content style="z-index: 2">
         <v-list-item-title>{{ getButtonTitle }}</v-list-item-title>
         <v-list-item-subtitle>{{ getButtonSubtitle }}</v-list-item-subtitle>
         <!--        <v-btn :disabled="!updateButtonState"

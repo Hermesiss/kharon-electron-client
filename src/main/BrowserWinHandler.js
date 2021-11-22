@@ -1,9 +1,11 @@
 /* eslint-disable */
-import { EventEmitter } from 'events'
-import { BrowserWindow, app } from 'electron'
+import {EventEmitter} from 'events'
+import {BrowserWindow, app} from 'electron'
+
 const DEV_SERVER_URL = process.env.DEV_SERVER_URL
 const isProduction = process.env.NODE_ENV === 'production'
 const isDev = process.env.NODE_ENV === 'development'
+const windowStateKeeper = require('electron-window-state');
 
 const Store = require('electron-store');
 
@@ -14,7 +16,7 @@ export default class BrowserWinHandler {
    * @param [options] {object} - browser window options
    * @param [allowRecreate] {boolean}
    */
-  constructor (options, allowRecreate = true) {
+  constructor(options, allowRecreate = true) {
     this._eventEmitter = new EventEmitter()
     this.allowRecreate = allowRecreate
     this.options = options
@@ -22,7 +24,7 @@ export default class BrowserWinHandler {
     this._createInstance()
   }
 
-  _createInstance () {
+  _createInstance() {
     // This method will be called when Electron has finished
     // initialization and is ready to create browser windows.
     // Some APIs can only be used after this event occurs.
@@ -39,9 +41,19 @@ export default class BrowserWinHandler {
     app.on('activate', () => this._recreate())
   }
 
-  _create () {
+  _create() {
+    let mainWindowState = windowStateKeeper({
+      defaultWidth: 1920,
+      defaultHeight: 1080
+    });
+
     this.browserWindow = new BrowserWindow(
       {
+        x: mainWindowState.x,
+        y: mainWindowState.y,
+        width: mainWindowState.width,
+        height: mainWindowState.height,
+        fullscreen: mainWindowState.fullscreen,
         ...this.options,
         webPreferences: {
           ...this.options.webPreferences,
@@ -49,8 +61,10 @@ export default class BrowserWinHandler {
           nodeIntegration: true, // allow loading modules via the require () function
           contextIsolation: false, // https://github.com/electron/electron/issues/18037#issuecomment-806320028
         }
-      }
-    )
+      })
+
+    mainWindowState.manage(this.browserWindow)
+
     this.browserWindow.on('closed', () => {
       // Dereference the window object
       this.browserWindow = null
@@ -58,7 +72,7 @@ export default class BrowserWinHandler {
     this._eventEmitter.emit('created')
   }
 
-  _recreate () {
+  _recreate() {
     if (this.browserWindow === null) this._create()
   }
 
@@ -71,7 +85,7 @@ export default class BrowserWinHandler {
    *
    * @param callback {onReadyCallback}
    */
-  onCreated (callback) {
+  onCreated(callback) {
     if (this.browserWindow !== null) return callback(this.browserWindow);
     this._eventEmitter.once('created', () => {
       callback(this.browserWindow)
@@ -89,7 +103,7 @@ export default class BrowserWinHandler {
    *
    * @returns {Promise<BrowserWindow>}
    */
-  created () {
+  created() {
     return new Promise(resolve => {
       this.onCreated(() => resolve(this.browserWindow))
     })

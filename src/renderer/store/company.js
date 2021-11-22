@@ -18,7 +18,6 @@ export const getters = {
   },
   getSelectedCompany: (state, getters, rootState, rootGetters) => {
     const isAdmin = rootGetters['user/isAdmin']
-    console.log('IS ADMIN', isAdmin)
     return isAdmin ? state.selectedCompany : getters.getCompanyById(rootGetters['auth.currentUser']?.company)
   },
 }
@@ -32,8 +31,6 @@ export const actions = {
     const companies = await this.$axios.$get('/companies/')
     state.commit('setCompanies', companies)
     const getter = state.getters.getSelectedCompany
-    console.log(state.getters)
-    console.log('GETTER', getter)
     await state.dispatch('selectCompany', companies.find(x => x.id === getter?.id))
   },
   /* {

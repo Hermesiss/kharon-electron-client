@@ -1,7 +1,9 @@
 const path = require('path')
+const fs = require('fs')
 const {app, ipcMain, BrowserWindow} = require('electron')
 const {download} = require('electron-dl')
 const fetch = require('electron-fetch').default
+const isDev = require('electron-is-dev')
 const {checkForUpdatesSelf, downloadSelf, installSelf} = require('./update/selfUpdater')
 
 // Quit when all windows are closed.
@@ -9,6 +11,11 @@ app.on('window-all-closed', function () {
   // On macOS it is common for applications and their menu bar
   // to stay active until the user quits explicitly with Cmd + Q
   if (process.platform !== 'darwin') app.quit()
+})
+
+app.on('browser-window-created', (event, win) => {
+  console.log('WINDOW CREATED', event, win)
+  if (!isDev) win.removeMenu()
 })
 
 // Load here all startup windows
@@ -38,7 +45,6 @@ ipcMain.handle('install-update', async () => {
 })
 
 const {generateManifest, diffManifests} = require('./update/fileComparer')
-const fs = require("fs");
 
 ipcMain.handle('manifest-generate', async (event, directory) => {
   return await generateManifest(directory, {ignoredFiles: ['file.json'], ignoredExtensions: [], relativeResult: true})
@@ -49,7 +55,6 @@ ipcMain.handle('manifest-diff', async (event, oldManifest, newManifest) => {
 })
 
 ipcMain.handle('download-app', async (event, app, filePath) => {
-  const win = BrowserWindow.getFocusedWindow()
   const webContents = require('electron').webContents.getFocusedWebContents()
   const version = app.versions[0].version
   const baseUrl = `${app.rootPath}/${app.appCode}/${version}`

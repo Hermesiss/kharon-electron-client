@@ -12,7 +12,6 @@ const appConfigSchema = {
 
 // noinspection JSCheckFunctionSignatures
 const mainStore = new ElectronStore({name: 'config-apps', schema: mainStoreSchema})
-console.log('LOADED APPS', mainStore)
 
 export const state = () => ({
   apps: [],
@@ -42,13 +41,9 @@ export const getters = {
 
 export const actions = {
   async fetchApps(context, apps) {
-    console.log(apps)
     if (!apps) {
-      console.log(context)
       const c = context.rootGetters['company/getSelectedCompany']
-      console.log('SELECTED COMPANY', c)
       apps = c?.apps
-      console.log(apps)
     }
     const appArr = []
     context.commit('setApps', [])
