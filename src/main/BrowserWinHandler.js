@@ -5,6 +5,10 @@ const DEV_SERVER_URL = process.env.DEV_SERVER_URL
 const isProduction = process.env.NODE_ENV === 'production'
 const isDev = process.env.NODE_ENV === 'development'
 
+const Store = require('electron-store');
+
+Store.initRenderer();
+
 export default class BrowserWinHandler {
   /**
    * @param [options] {object} - browser window options

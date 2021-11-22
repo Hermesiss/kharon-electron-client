@@ -1,52 +1,64 @@
 <template>
   <v-app>
     <v-main>
-      <v-app-bar v-if="isLogged" dense flat app>
+      <!--      <v-app-bar v-if="isLogged" dense flat app>
         <v-app-bar-nav-icon v-if="!isNavPermanent" @click.stop="drawer = !drawer"/>
-      </v-app-bar>
+      </v-app-bar>-->
       <v-navigation-drawer v-if="isLogged"
                            v-model="drawer"
-                           :permanent="isNavPermanent"
+                           :mini-variant="mini"
+                           permanent
                            app
                            class="pa-0"
       >
-        <v-layout column fill-height class="overflow-y-hidden">
-          <v-toolbar-title class="text-center py-2">
-            Hello, {{ username }}
-          </v-toolbar-title>
+        <v-layout column fill-height>
           <v-list>
-            <v-list-item to="/">
+            <v-list-item class="px-2">
+              <v-list-item-avatar @click.stop="mini? (mini= !mini) : null">
+                <v-icon>{{ userIcon }}</v-icon>
+              </v-list-item-avatar>
               <v-list-item-content>
-                <v-list-item-title class="text-h6">
-                  Home
+                <v-list-item-title>
+                  {{ username }}
+                </v-list-item-title>
+              </v-list-item-content>
+              <v-list-item-action>
+                <v-btn
+                  small
+                  icon
+                  @click.stop="mini = !mini"
+                >
+                  <v-icon>mdi-chevron-left</v-icon>
+                </v-btn>
+              </v-list-item-action>
+            </v-list-item>
+            <v-list-item to="/" class="px-2">
+              <v-list-item-avatar>
+                <v-icon>mdi-home</v-icon>
+              </v-list-item-avatar>
+              <v-list-item-content>
+                <v-list-item-title>
+                  {{ $t('home.title') }}
                 </v-list-item-title>
               </v-list-item-content>
             </v-list-item>
           </v-list>
           <v-spacer/>
           <v-list>
-            <v-list-item v-if="isLogged" @click="logout">
+            <v-list-item @click="testManifests">
               <v-list-item-content>
-                <v-list-item-title class="text-h6">
-                  Log out
+                <v-list-item-title>
+                  Test manifests
                 </v-list-item-title>
               </v-list-item-content>
             </v-list-item>
-            <v-list-item v-else to="login">
+            <v-list-item to="/settings" class="px-2">
+              <v-list-item-avatar>
+                <v-icon>mdi-cog</v-icon>
+              </v-list-item-avatar>
               <v-list-item-content>
-                <v-list-item-title class="text-h6">
-                  Log in
-                </v-list-item-title>
-              </v-list-item-content>
-            </v-list-item>
-            <v-list-item v-for="locale in availableLocales" :key="locale.code"
-                         :disabled="!locale.available"
-                         :inactive="!locale.available"
-                         @click.prevent.stop="$i18n.setLocale(locale.code)"
-            >
-              <v-list-item-content>
-                <v-list-item-title class="text-h6">
-                  {{ locale.name }}
+                <v-list-item-title>
+                  {{ $t('settings.title') }}
                 </v-list-item-title>
               </v-list-item-content>
             </v-list-item>
@@ -61,6 +73,8 @@
 
 <script>
 
+import {ipcRenderer} from 'electron'
+import {mapGetters} from 'vuex'
 import UpdateChecker from '../components/updateChecker'
 
 export default {
@@ -68,12 +82,29 @@ export default {
   data() {
     return {
       drawer: false,
+      mini: false,
       updateButtonState: true,
       updateProgress: 0,
-      showDownloadState: false
+      showDownloadState: false,
+      oldManifest: {},
+      newManifest: {},
+      diff: {}
     }
   },
   computed: {
+    ...mapGetters({
+      userRole: 'user/currentUserRole',
+    }),
+    userIcon() {
+      switch (this.userRole) {
+      case 'admin':
+        return 'mdi-shield-crown-outline'
+      case 'owner':
+        return 'mdi-account-hard-hat'
+      default:
+        return 'mdi-account'
+      }
+    },
     isLogged() {
       return this.$auth.loggedIn
     },
@@ -82,25 +113,13 @@ export default {
     },
     username() {
       const user = this.$store.state.auth?.user
-
       return user ? (user.company ? user.company + ':' : '') + user.firstName : ''
-    },
-    availableLocales() {
-      return this.$i18n.locales.map(i => {
-        i.available = (i.code !== this.$i18n.locale)
-        return i
-      })
     }
   },
   methods: {
-    async logout() {
-      try {
-        await this.$auth.logout('local')
-      } catch (err) {
-        console.error(err)
-      }
-    },
+    async testManifests() {
 
+    }
   }
 }
 </script>

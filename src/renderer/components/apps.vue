@@ -27,6 +27,9 @@
             <v-btn icon @click.prevent.stop="openEditDialogue(app)">
               <v-icon>mdi-pencil</v-icon>
             </v-btn>
+            <v-btn icon @click.prevent.stop="startDownload(app)">
+              <v-icon>mdi-download</v-icon>
+            </v-btn>
           </v-list-item-action>
         </v-list-item>
       </v-list-item-group>
@@ -91,6 +94,7 @@
 
 <script>
 import {mapActions, mapGetters, mapMutations, mapState} from 'vuex'
+import {ipcRenderer} from 'electron'
 
 export default {
   name: 'Apps',
@@ -118,6 +122,9 @@ export default {
         ],
       }
     }
+  },
+  mounted() {
+    ipcRenderer.on('app-download-progress', (_, progress) => console.log('RENDERER PROGRESS', progress.totalPercent))
   },
   methods: {
     ...mapActions({
@@ -165,6 +172,9 @@ export default {
       }
 
       return 'No version'
+    },
+    async startDownload(app) {
+      await ipcRenderer.invoke('download-app', app, 'C:/Temp')
     }
   }
 }

@@ -1,8 +1,24 @@
-import {app} from 'electron'
+import ElectronStore from 'electron-store'
+
+const mainStoreSchema = {
+  apps: {type: 'array', default: []}
+}
+
+const appConfigSchema = {
+  installed: {type: 'boolean', default: false},
+  installedPath: {type: 'string', default: ''},
+  settings: {type: 'array', default: []}
+}
+
+// noinspection JSCheckFunctionSignatures
+const mainStore = new ElectronStore({name: 'config-apps', schema: mainStoreSchema})
+console.log('LOADED APPS', mainStore)
 
 export const state = () => ({
   apps: [],
-  selectedApp: null
+  selectedApp: null,
+  installedApps: mainStore.get('apps'),
+  appConfigs: {}
 })
 
 export const mutations = {
@@ -11,6 +27,10 @@ export const mutations = {
   },
   setSelectedApp(state, selectedApp) {
     state.selectedApp = selectedApp
+  },
+  addConfig(state, appCode) {
+    // noinspection JSCheckFunctionSignatures
+    state.appConfigs[appCode] = new ElectronStore({name: `config-app-${appCode}`, schema: appConfigSchema})
   }
 }
 
@@ -21,23 +41,27 @@ export const getters = {
 }
 
 export const actions = {
-  async fetchApps(state, apps) {
+  async fetchApps(context, apps) {
     console.log(apps)
     if (!apps) {
-      console.log(state)
-      const c = state.rootGetters['company/getSelectedCompany']
+      console.log(context)
+      const c = context.rootGetters['company/getSelectedCompany']
       console.log('SELECTED COMPANY', c)
       apps = c?.apps
       console.log(apps)
     }
     const appArr = []
-    state.commit('setApps', [])
+    context.commit('setApps', [])
+    const configs = context.state.appConfigs
     for (const appsKey of apps) {
-      const appInfo = await state.dispatch('getApp', appsKey)
+      const appInfo = await context.dispatch('getApp', appsKey)
       appArr.push(appInfo)
+      if (!configs[appInfo.appCode]) {
+        context.commit('addConfig', appInfo.appCode)
+      }
     }
 
-    state.commit('setApps', appArr)
+    context.commit('setApps', appArr)
   },
   async getApp(state, id) {
     return await this.$axios.$get(`/apps/${id}`)
