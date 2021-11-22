@@ -50,6 +50,13 @@
                 </v-list-item-title>
               </v-list-item-content>
             </v-list-item>
+            <v-list-item @click="testManifests">
+              <v-list-item-content>
+                <v-list-item-title class="text-h6">
+                  Test manifests
+                </v-list-item-title>
+              </v-list-item-content>
+            </v-list-item>
           </v-list>
           <update-checker/>
         </v-layout>
@@ -61,6 +68,7 @@
 
 <script>
 
+import {ipcRenderer} from 'electron'
 import UpdateChecker from '../components/updateChecker'
 
 export default {
@@ -70,7 +78,10 @@ export default {
       drawer: false,
       updateButtonState: true,
       updateProgress: 0,
-      showDownloadState: false
+      showDownloadState: false,
+      oldManifest: {},
+      newManifest: {},
+      diff: {}
     }
   },
   computed: {
@@ -100,6 +111,13 @@ export default {
         console.error(err)
       }
     },
+    async testManifests() {
+      this.oldManifest = await ipcRenderer.invoke('manifest-generate',
+        'd:\\Repos\\Intetix\\intetix-ritek-touch\\Builds\\Ritek-Touch-Full-1.1.5\\')
+      this.newManifest = await ipcRenderer.invoke('manifest-generate',
+        'd:\\Repos\\Intetix\\intetix-ritek-touch\\Builds\\Ritek-Touch-Full-1.1.6\\')
+      this.diff = await ipcRenderer.invoke('manifest-diff', this.oldManifest, this.newManifest)
+    }
 
   }
 }

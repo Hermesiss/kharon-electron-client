@@ -37,11 +37,11 @@ let onProgressFunc
 let onStartDownloadFunc
 let onEndDownloadFunc
 
-const install = () => {
+const installSelf = () => {
   setImmediate(() => autoUpdater.quitAndInstall())
 }
 
-const download = async (onProgress, onStartDownload, onEndDownload) => {
+const downloadSelf = async (onProgress, onStartDownload, onEndDownload) => {
   onProgressFunc = onProgress
   onStartDownloadFunc = onStartDownload
   onEndDownloadFunc = onEndDownload
@@ -49,8 +49,8 @@ const download = async (onProgress, onStartDownload, onEndDownload) => {
   await autoUpdater.downloadUpdate()
 }
 
-const checkForUpdates = async onFetchResult => {
+const checkForUpdatesSelf = async onFetchResult => {
   onFetchResultFunc = onFetchResult
   return await autoUpdater.checkForUpdates()
 }
-module.exports = {checkForUpdates, download, install}
+module.exports = {checkForUpdatesSelf, downloadSelf, installSelf}
