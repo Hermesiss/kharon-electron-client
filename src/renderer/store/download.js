@@ -1,10 +1,15 @@
 import semver from 'semver'
+import {ipcRenderer} from 'electron'
 import {UpdateState} from '~/plugins/types'
 
+require('dotenv').config()
+
+let isInitialized = false
+
 export const state = () => ({
-  installedVersion: '0.0.1', // localStorage.getItem('installedVersion'),
-  availableVersion: '0.0.1', // localStorage.getItem('availableVersion'),
-  downloadedVersion: localStorage.getItem('downloadedVersion') || '0.0.1',
+  installedVersion: '0.0.1',
+  availableVersion: '0.0.1',
+  downloadedVersion: '0.0.1',
   downloadSize: 0,
   downloadProgress: 0,
   isFetching: false,
@@ -15,20 +20,13 @@ export const mutations = {
   increment(state) {
     state.counter++
   },
-  setInstalledVersion(state, version) {
-    version = semver.clean(version)
-    localStorage.setItem('installedVersion', version)
-    state.installedVersion = version
-  },
   setAvailableVersion(state, version) {
     version = semver.clean(version)
-    localStorage.setItem('availableVersion', version)
     state.availableVersion = version
   },
-  setDownloadedVersion(state, version) {
+  setInstalledVersion(state, version) {
     version = semver.clean(version)
-    localStorage.setItem('downloadedVersion', version)
-    state.downloadedVersion = version
+    state.installedVersion = version
   },
   setDownloadSize(state, size) {
     state.downloadSize = size
@@ -48,15 +46,47 @@ export const mutations = {
 }
 
 export const actions = {
-  setInstalled({commit}, version) {
-    commit('installedVersion', version)
+  async initStore(context) {
+    if (!isInitialized) {
+      isInitialized = true
+      ipcRenderer.on('downloadProgress',
+        (_, progress) => context.commit('setDownloadProgress', progress))
+      ipcRenderer.on('downloadState', (_, state) => {
+        if (state) {
+          context.commit('setDownloadedVersionAsAvailable')
+        }
+        context.commit('setDownloading', state)
+      })
+
+      await context.dispatch('checkUpdate')
+
+      setInterval(() => context.dispatch('checkUpdate'), 300 * 1000)
+    }
   },
-  setAvailable({commit}, version) {
-    commit('installedVersion', version)
+  async checkUpdate(context) {
+    const currentState = context.getters.currentUpdateState
+    if (currentState !== UpdateState.Actual) return
+
+    context.commit('setFetching', true)
+    const result = await ipcRenderer.invoke('check-update', '')
+    context.commit('setAvailableVersion', result.updateInfo.version)
+    context.commit('setDownloadSize', result.updateInfo.files.reduce((a, x) => a + x.size, 0))
+    context.commit('setFetching', false)
   },
-  setDownloaded({commit}, version) {
-    commit('installedVersion', version)
+  async downloadUpdate(context) {
+    context.commit('setDownloadProgress', 0)
+    context.commit('setDownloading', true)
+    await ipcRenderer.invoke('download-update', '')
+    context.commit('setDownloading', false)
   },
+  async installUpdate() {
+    await ipcRenderer.invoke('install-update', '')
+  },
+  async getInstalledVersion(context) {
+    const version = process.env.NODE_ENV === 'development' ? '0.0.1' : await ipcRenderer.invoke('get-version')
+    context.commit('setInstalledVersion', version)
+    return version
+  }
 }
 
 export const getters = {

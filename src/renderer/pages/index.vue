@@ -2,12 +2,15 @@
   <!--    <h1>{{ $t('common.helloWorld') }}</h1>
   <NuxtLink to="login">LOGIN</NuxtLink>-->
   <v-container fluid fill-height class="pa-0">
-    <v-row class="fill-height " dense no-gutters>
-      <v-col v-if="isAdmin" cols="4" class="fill-height">
-        <companies fill-height/>
+    <v-row class="fill-height" no-gutters>
+      <v-col v-if="isAdmin" cols="4" class="fill-height py-0">
+        <companies fill-height class="elevation-4"/>
       </v-col>
-      <v-col v-if="getSelectedCompany" cols="6" class="fill-height">
-        <apps fill-height/>
+      <v-col v-if="getSelectedCompany" cols="auto" class="fill-height py-0">
+        <apps fill-height class="elevation-1"/>
+      </v-col>
+      <v-col v-if="selectedApp" class="fill-height">
+        <selected-app class="elevation-1"/>
       </v-col>
     </v-row>
   </v-container>
@@ -15,12 +18,13 @@
 
 <script>
 import {remote} from 'electron'
-import {mapGetters} from 'vuex'
+import {mapActions, mapGetters, mapState} from 'vuex'
 import Companies from '../components/companies'
 import Apps from '../components/apps'
+import SelectedApp from '../components/app/selectedApp'
 
 export default {
-  components: {Apps, Companies},
+  components: {SelectedApp, Apps, Companies},
   data() {
     return {}
   },
@@ -28,12 +32,18 @@ export default {
     ...mapGetters({
       isAdmin: 'user/isAdmin',
       getSelectedCompany: 'company/getSelectedCompany'
+    }),
+    ...mapState({
+      selectedApp: state => state.app.selectedApp
     })
   },
-  async mounted() {
-    await this.$store.dispatch('company/fetchCompanies')
+  mounted() {
+    this.fetchCompanies()
   },
   methods: {
+    ...mapActions({
+      fetchCompanies: 'company/fetchCompanies'
+    }),
     openURL(url) {
       remote.shell.openExternal(url)
     }

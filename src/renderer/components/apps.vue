@@ -1,17 +1,24 @@
 <template>
-  <v-card class="fill-height">
+  <v-card class="fill-height" width="300">
     <v-card-title>
       {{ $t('apps.title') }}
       <v-flex/>
       <v-btn icon @click="fetchApps()">
         <v-icon>mdi-refresh</v-icon>
       </v-btn>
-      <v-btn icon @click="openEditDialogue(null)">
+      <v-btn v-if="isAdmin" icon @click="openEditDialogue(null)">
         <v-icon>mdi-plus</v-icon>
       </v-btn>
     </v-card-title>
     <v-list>
+      <v-list-item-group v-if="isFetching">
+        <v-skeleton-loader v-for="index in skeletonNumber"
+                           :key="index"
+                           type="list-item-two-line"
+        />
+      </v-list-item-group>
       <v-list-item-group
+        v-else
         :value="selected"
         color="primary"
       >
@@ -24,7 +31,7 @@
             <v-list-item-subtitle>[{{ app.appCode }}]: {{ getVersion(app) }}</v-list-item-subtitle>
           </v-list-item-content>
           <v-list-item-action>
-            <v-btn icon @click.prevent.stop="openEditDialogue(app)">
+            <v-btn v-if="isAdmin" icon @click.prevent.stop="openEditDialogue(app)">
               <v-icon>mdi-pencil</v-icon>
             </v-btn>
             <v-btn icon @click.prevent.stop="startDownload(app)">
@@ -106,11 +113,14 @@ export default {
   computed: {
     ...mapGetters({
       userRole: 'user/currentUserRole',
+      isAdmin: 'user/isAdmin'
     }),
     ...mapState({
       apps: state => state.app.apps,
       selectedApp: state => state.app.selectedApp,
-      companies: state => state.company.companies
+      companies: state => state.company.companies,
+      isFetching: state => state.app.isFetching,
+      skeletonNumber: state => state.app.lastAppCount
     }),
     selected() {
       return this.apps.indexOf(this.selectedApp)

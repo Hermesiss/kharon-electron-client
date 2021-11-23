@@ -12,6 +12,7 @@
 
 <script>
 
+import {mapActions} from 'vuex'
 import Drawer from '~/components/drawer/drawer'
 
 export default {
@@ -20,10 +21,13 @@ export default {
     return {}
   },
   computed: {},
+  mounted() {
+    this.initStore()
+  },
   methods: {
-    async testManifests() {
-
-    }
+    ...mapActions({
+      initStore: 'download/initStore'
+    })
   }
 }
 </script>

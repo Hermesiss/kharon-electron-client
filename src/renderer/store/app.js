@@ -17,7 +17,9 @@ export const state = () => ({
   apps: [],
   selectedApp: null,
   installedApps: mainStore.get('apps'),
-  appConfigs: {}
+  appConfigs: {},
+  lastAppCount: 3,
+  isFetching: false
 })
 
 export const mutations = {
@@ -30,6 +32,9 @@ export const mutations = {
   addConfig(state, appCode) {
     // noinspection JSCheckFunctionSignatures
     state.appConfigs[appCode] = new ElectronStore({name: `config-app-${appCode}`, schema: appConfigSchema})
+  },
+  setFetching(state, fetching){
+    state.isFetching = fetching
   }
 }
 
@@ -45,6 +50,8 @@ export const actions = {
       const c = context.rootGetters['company/getSelectedCompany']
       apps = c?.apps
     }
+    context.commit('setFetching', true)
+    context.state.lastAppCount = apps.length
     const appArr = []
     context.commit('setApps', [])
     const configs = context.state.appConfigs
@@ -57,6 +64,7 @@ export const actions = {
     }
 
     context.commit('setApps', appArr)
+    context.commit('setFetching', false)
   },
   async getApp(state, id) {
     return await this.$axios.$get(`/apps/${id}`)

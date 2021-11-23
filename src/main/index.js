@@ -55,20 +55,18 @@ ipcMain.handle('manifest-diff', async (event, oldManifest, newManifest) => {
 })
 
 ipcMain.handle('download-app', async (event, app, filePath) => {
+  const win = BrowserWindow.getFocusedWindow()
   const webContents = require('electron').webContents.getFocusedWebContents()
   const version = app.versions[0].version
   const baseUrl = `${app.rootPath}/${app.appCode}/${version}`
   const manifestUrl = `${baseUrl}/manifest.json`
   const response = await fetch(manifestUrl)
   const manifest = await response.json()
-  // console.log(manifest)
   const totalSize = manifest.files.reduce((a, x) => a + x.fileSize, 0)
-  console.log(totalSize)
   let downloaded = 0
 
   for (const manifestElement of manifest.files) {
     const url = `${baseUrl}/${manifestElement.filePath}`
-    // console.log('Trying to download', url)
     const fullLocalPath = path.resolve(filePath, manifestElement.filePath)
     if (fs.existsSync(fullLocalPath)) {
       fs.unlinkSync(fullLocalPath)
@@ -83,13 +81,7 @@ ipcMain.handle('download-app', async (event, app, filePath) => {
         currentProgress.totalPercent = currentProgress.totalTransferredBytes / currentProgress.totalBulkBytes * 100
         webContents.send('app-download-progress', currentProgress)
       },
-      onTotalProgress: totalProgress => {
-        // console.log('TOTAL PROGRESS', totalProgress)
-      }
     })
     downloaded += manifestElement.fileSize
-    // console.log(result)
   }
-
-  console.log('downloaded')
 })

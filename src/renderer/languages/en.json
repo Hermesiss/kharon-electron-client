@@ -54,6 +54,20 @@
     "management": "Management",
     "title": "Settings"
   },
+  "updater": {
+    "subtitle": {
+      "actual-version": "Actual version",
+      "available": "Update available",
+      "downloaded": "Update downloaded"
+    },
+    "title": {
+      "actual": "Check for update",
+      "canInstall": "Restart and update",
+      "downloading": "Downloading...",
+      "fetching": "Fetching...",
+      "newAvailable": "Download"
+    }
+  },
   "users": {
     "title": "Users"
   }

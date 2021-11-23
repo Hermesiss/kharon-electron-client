@@ -88,7 +88,6 @@ export default {
         return this.$i18n.locale
       },
       set(newValue) {
-        console.log('SET', newValue)
         this.$i18n.setLocale(newValue)
       }
     },

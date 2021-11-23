@@ -54,6 +54,20 @@
     "management": "Управление",
     "title": "Настройки"
   },
+  "updater": {
+    "subtitle": {
+      "actual-version": "Актуальная версия",
+      "available": "Новая версия",
+      "downloaded": "Скачено"
+    },
+    "title": {
+      "actual": "Проверить обновления",
+      "canInstall": "Перезапустить и установить",
+      "downloading": "Скачивается...",
+      "fetching": "Проверка...",
+      "newAvailable": "Скачать"
+    }
+  },
   "users": {
     "title": "Пользователи"
   }

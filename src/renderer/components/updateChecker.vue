@@ -1,6 +1,6 @@
 <template>
   <v-list class="py-0">
-    <v-list-item :disabled="!updateButtonState" :loading="fetching" :class="getButtonClass" @click="getButtonAction">
+    <v-list-item :disabled="!updateButtonState" :loading="isFetching" :class="getButtonClass" @click="getButtonAction">
       <v-progress-linear v-model="downloadProgress" color="green"
                          absolute height="100%" striped :active="isDownloading"
                          style="z-index: 1"
@@ -8,14 +8,6 @@
       <v-list-item-content style="z-index: 2">
         <v-list-item-title>{{ getButtonTitle }}</v-list-item-title>
         <v-list-item-subtitle>{{ getButtonSubtitle }}</v-list-item-subtitle>
-        <!--        <v-btn :disabled="!updateButtonState"
-               :loading="fetching"
-               tile
-               block
-               @click="getButtonAction"
-        >
-          {{ getButtonTitle }}
-        </v-btn>-->
       </v-list-item-content>
     </v-list-item>
   </v-list>
@@ -24,7 +16,7 @@
 <script>
 import {ipcRenderer} from 'electron'
 import humanize from 'humanize'
-import {mapGetters, mapMutations, mapState} from 'vuex'
+import {mapActions, mapGetters, mapMutations, mapState} from 'vuex'
 import {UpdateState} from '~/plugins/types'
 
 export default {
@@ -32,10 +24,7 @@ export default {
 
   data() {
     return {
-      updateButtonState: true,
       updateProgress: 0,
-      fetching: false,
-      isDownloading: false
     }
   },
   computed: {
@@ -50,15 +39,20 @@ export default {
       installedVersion: state => state.download.installedVersion,
       availableVersion: state => state.download.availableVersion,
       downloadedVersion: state => state.download.downloadedVersion,
-      downloadSize: state => state.download.downloadSize
+      downloadSize: state => state.download.downloadSize,
+      isFetching: state => state.download.isFetching,
+      isDownloading: state => state.download.isDownloading
     }),
+    updateButtonState() {
+      return !this.isDownloading && !this.isFetching
+    },
     getButtonClass() {
       switch (this.currentUpdateState) {
-      case UpdateState.NewAvailable:
-      case UpdateState.CanInstall:
-        return 'success'
-      default:
-        return ''
+        case UpdateState.NewAvailable:
+        case UpdateState.CanInstall:
+          return 'success'
+        default:
+          return ''
       }
 
       /* switch (this.currentUpdateState) {
@@ -79,19 +73,18 @@ export default {
     },
     getButtonTitle() {
       switch (this.currentUpdateState) {
-      case UpdateState.CanInstall:
-        return 'Restart and update'
-      case UpdateState.Actual:
-        return 'Check for update'
-      case UpdateState.Fetching:
-        return 'Fetching...'
-      case UpdateState.NewAvailable:
-        return `Download ${humanize.filesize(this.downloadSize)}`
-
-      case UpdateState.Downloading:
-        return 'Downloading...'
-      default:
-        return ''
+        case UpdateState.CanInstall:
+          return this.$i18n.t('updater.title.canInstall')
+        case UpdateState.Actual:
+          return this.$i18n.t('updater.title.actual')
+        case UpdateState.Fetching:
+          return this.$i18n.t('updater.title.fetching')
+        case UpdateState.NewAvailable:
+          return this.$i18n.t('updater.title.newAvailable') + ` ${humanize.filesize(this.downloadSize)}`
+        case UpdateState.Downloading:
+          return this.$i18n.t('updater.title.downloading')
+        default:
+          return ''
       }
 
       /* if (this.isDownloading) return 'Downloading...'
@@ -103,23 +96,17 @@ export default {
     },
     getButtonSubtitle() {
       switch (this.currentUpdateState) {
-      case UpdateState.CanInstall:
-        return `Update downloaded [${this.installedVersion}] -> [${this.downloadedVersion}]`
-      case UpdateState.NewAvailable:
-        return `Update available [${this.installedVersion}] -> [${this.availableVersion}]`
-      case UpdateState.Downloading:
-        return `${humanize.filesize(this.downloadedBytes)}/${humanize.filesize(this.downloadSize)}`
-      default:
-        return `Actual version [${this.installedVersion}]`
+        case UpdateState.CanInstall:
+          return `${this.$i18n.t('updater.subtitle.downloaded')}
+           [${this.installedVersion}] -> [${this.downloadedVersion}]`
+        case UpdateState.NewAvailable: // Update available
+          return `${this.$i18n.t('updater.subtitle.available')}
+           [${this.installedVersion}] -> [${this.availableVersion}]`
+        case UpdateState.Downloading:
+          return `${humanize.filesize(this.downloadedBytes)}/${humanize.filesize(this.downloadSize)}`
+        default:
+          return `${this.$i18n.t('updater.subtitle.actual-version')} [${this.installedVersion}]`
       }
-
-      /* if (this.isPending) {
-        return `Update available [${this.installedVersion}] -> [${this.downloadedVersion}]`
-      }
-      if (!this.isActual) {
-        return `Update available [${this.installedVersion}] -> [${this.availableVersion}]`
-      }
-      return `Actual version [${this.installedVersion}]` */
     },
     getButtonAction() {
       if (this.isPending) return this.installUpdate
@@ -128,52 +115,15 @@ export default {
     },
   },
   async mounted() {
-    const appVersion = process.env.NODE_ENV === 'development' ? '0.0.1' : await ipcRenderer.invoke('get-version')
-    const app = this
-    this.setInstalledVersion(appVersion)
-
-    ipcRenderer.on('downloadProgress', (_, progress) => this.setDownloadProgress(progress))
-    ipcRenderer.on('downloadState', (_, state) => {
-      if (state) {
-        app.setDownloadedVersionAsAvailable()
-      }
-
-      app.setDownloading(state)
-    })
-    // ipcRenderer.on('canUpdate', () => this.setNeedUpdate())
+    await this.getInstalledVersion()
   },
   methods: {
-    async checkUpdate() {
-      this.setButtonState(false)
-      this.setFetching(true)
-      const result = await ipcRenderer.invoke('check-update', '')
-      this.$store.commit('download/setAvailableVersion', result.updateInfo.version)
-      this.$store.commit('download/setDownloadSize', result.updateInfo.files.reduce((a, x) => a + x.size, 0))
-      this.setButtonState(true)
-      this.setFetching(false)
-    },
-    async downloadUpdate() {
-      this.setDownloadProgress(0)
-      this.setButtonState(false)
-      this.isDownloading = true
-      await ipcRenderer.invoke('download-update', '')
-      this.isDownloading = false
-      this.setButtonState(true)
-    },
-    async installUpdate() {
-      await ipcRenderer.invoke('install-update', '')
-    },
-    setButtonState(mode) {
-      this.updateButtonState = mode
-    },
-    ...mapMutations({
-      setDownloadProgress: 'download/setDownloadProgress',
-      setFetching: 'download/setFetching',
-      setDownloading: 'download/setDownloading',
-      setDownloadedVersionAsAvailable: 'download/setDownloadedVersionAsAvailable',
-      setInstalledVersion: 'download/setInstalledVersion',
-    })
-
+    ...mapActions({
+      checkUpdate: 'download/checkUpdate',
+      downloadUpdate: 'download/downloadUpdate',
+      installUpdate: 'download/installUpdate',
+      getInstalledVersion: 'download/getInstalledVersion'
+    }),
   }
 }
 </script>

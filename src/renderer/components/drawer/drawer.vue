@@ -7,7 +7,7 @@
                        class="pa-0"
   >
     <v-layout column fill-height>
-      <v-list class="fill-height">
+      <v-list class="fill-height pa-0">
         <v-list-item class="px-2">
           <v-list-item-avatar @click.stop="mini? (mini= !mini) : null">
             <v-icon>{{ userIcon }}</v-icon>
@@ -37,6 +37,10 @@
         <drawer-list-item v-for="page in bottomPages" :key="page.path" :caption="page.captionKey" :icon="page.icon"
                           :path="page.path"
         />
+
+        <drawer-list-item caption="settings.title" icon="mdi-cog"
+                          path="/settings" :badge-value="!isActual"
+        />
       </v-list>
     </template>
   </v-navigation-drawer>
@@ -59,29 +63,30 @@ export default {
       ],
       bottomPages: [
         {path: '/debug', icon: 'mdi-hammer-wrench', captionKey: 'debug.title', rolesOnly: ['admin']},
-        {path: '/settings', icon: 'mdi-cog', captionKey: 'settings.title'}
+        // {path: '/settings', icon: 'mdi-cog', captionKey: 'settings.title'}
       ],
     }
   },
   computed: {
     ...mapGetters({
       userRole: 'user/currentUserRole',
+      isActual: 'download/isActual'
     }),
     isLogged() {
       return this.$auth.loggedIn
     },
     username() {
       const user = this.$store.state.auth?.user
-      return user ? (user.company ? user.company + ':' : '') + user.firstName : ''
+      return user.firstName
     },
     userIcon() {
       switch (this.userRole) {
-      case 'admin':
-        return 'mdi-shield-crown-outline'
-      case 'owner':
-        return 'mdi-account-hard-hat'
-      default:
-        return 'mdi-account'
+        case 'admin':
+          return 'mdi-shield-crown-outline'
+        case 'owner':
+          return 'mdi-account-hard-hat'
+        default:
+          return 'mdi-account'
       }
     },
   }
