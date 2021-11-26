@@ -1,5 +1,5 @@
 <template>
-  <v-card class="fill-height">
+  <v-card class="fill-height" width="300">
     <v-card-title>
       {{ $t('companies.title') }}
       <v-flex/>

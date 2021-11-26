@@ -1,9 +1,10 @@
 const path = require('path')
-const fs = require('fs')
-const {app, ipcMain, BrowserWindow} = require('electron')
+const fs = require('fs-extra')
+const {app, ipcMain, BrowserWindow, dialog} = require('electron')
 const {download} = require('electron-dl')
 const fetch = require('electron-fetch').default
 const isDev = require('electron-is-dev')
+const ftp = require('basic-ftp')
 const {checkForUpdatesSelf, downloadSelf, installSelf} = require('./update/selfUpdater')
 
 // Quit when all windows are closed.
@@ -20,6 +21,70 @@ app.on('browser-window-created', (event, win) => {
 
 // Load here all startup windows
 require('./mainWindow')
+
+ipcMain.handle('get-folder', async () => {
+  const result = await dialog.showOpenDialog({properties: ['openDirectory']})
+  return result
+})
+
+ipcMain.handle('upload-ftp', async (event, params) => {
+  console.log('starting ftp with params', params)
+  const webContents = require('electron').webContents.getFocusedWebContents()
+  const appCode = params.appCode
+  const version = params.version
+  const ftpPath = params.ftpPath
+  const manifest = params.manifest
+  const selectedPath = params.selectedPath
+
+  const client = new ftp.Client()
+  client.ftp.verbose = true
+  let isSuccess = false
+
+  const totalBytes = manifest.files.reduce((a, x) => a + x.fileSize, 0)
+  let uploadedBytes = 0
+
+  try {
+    const result = await client.access({
+      host: params.host,
+      user: params.user,
+      password: params.password,
+      secure: false
+    })
+    console.log(await client.list(ftpPath))
+    console.log('FTP PATH', ftpPath)
+    const remoteDirPath = [ftpPath, appCode, version.toString()].join('/')
+    console.log('REMOTE PATH', remoteDirPath)
+    await client.ensureDir(remoteDirPath)
+
+    const manifestLength = manifest.files.length
+    for (let i = 0; i < manifestLength; i++) {
+      const manifestElement = manifest.files[i]
+      const from = path.join(selectedPath, manifestElement.filePath)
+      const to = [remoteDirPath, manifestElement.filePath].join('/').replaceAll('\\', '/')
+      const toDir = path.dirname(to)
+      console.log(manifestElement, from, to, toDir)
+      await client.ensureDir(toDir)
+      await client.uploadFrom(from, to)
+      console.log(`UPDATED ${i + 1} from ${manifestLength}`)
+      uploadedBytes += manifestElement.fileSize
+      webContents.send('ftp-uploaded', {
+        count: i + 1,
+        totalCount: manifestLength,
+        bytes: uploadedBytes,
+        totalBytes,
+        percent: uploadedBytes / totalBytes * 100,
+        currentFilePath: manifestElement.filePath,
+        currentFileSize: manifestElement.fileSize
+      })
+    }
+
+    isSuccess = true
+  } catch (err) {
+    console.log(err)
+  }
+  client.close()
+  return isSuccess
+})
 
 ipcMain.handle('get-version', () => app.getVersion())
 
@@ -46,8 +111,19 @@ ipcMain.handle('install-update', async () => {
 
 const {generateManifest, diffManifests} = require('./update/fileComparer')
 
-ipcMain.handle('manifest-generate', async (event, directory) => {
-  return await generateManifest(directory, {ignoredFiles: ['file.json'], ignoredExtensions: [], relativeResult: true})
+ipcMain.handle('manifest-generate', async (event, directory, savePath) => {
+  const manifest = await generateManifest(directory, {
+    ignoredFiles: ['file.json'],
+    ignoredExtensions: [],
+    relativeResult: true
+  })
+  if (savePath) {
+    const dirname = path.dirname(savePath)
+    console.log('DIRNAME', dirname)
+    fs.ensureDirSync(dirname)
+    fs.writeFileSync(savePath, JSON.stringify(manifest))
+  }
+  return manifest
 })
 
 ipcMain.handle('manifest-diff', async (event, oldManifest, newManifest) => {

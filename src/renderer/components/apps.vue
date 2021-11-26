@@ -65,8 +65,20 @@
                             required :rules="rules.required"
               />
               <v-select v-model="editedApp.company" :items="companies" item-text="companyName" item-value="id"
+                        :label="$t('company.company')"
                         required :rules="rules.required"
               />
+              <h3>Deploy</h3>
+              <v-text-field v-model="editedApp.ftpHost" :label="$t('apps.editor.ftpHost')"
+                            required :rules="rules.required"
+              />
+              <v-text-field v-model="editedApp.ftpPath" :label="$t('apps.editor.ftpPath')"
+                            required :rules="rules.required"
+              />
+              <v-text-field v-model="editedApp.exePath" :label="$t('apps.editor.exePath')"
+                            required :rules="rules.required"
+              />
+              <v-text-field v-model="editedApp.exeParams" :label="$t('apps.editor.exeParams')"/>
             </v-card-text>
 
             <v-divider/>

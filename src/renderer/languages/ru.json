@@ -1,15 +1,28 @@
 {
   "apps": {
+    "app": {
+      "changes": "Изменения",
+      "main": "Основное",
+      "version": "Версия",
+      "versions": "Версии"
+    },
     "editor": {
       "appCode": "Код приложения",
       "appName": "Имя приложения",
+      "exeParams": "Параметры запуска",
+      "exePath": "Путь до exe",
+      "ftpHost": "FTP сервер",
+      "ftpPath": "FTP путь",
       "rootPath": "Корневая папка",
       "title": {
         "create": "Создать приложение",
         "edit": "Редактировать приложение"
       }
     },
-    "title": "Приложения"
+    "title": "Приложения",
+    "upload": {
+      "localPath": "Локальный путь"
+    }
   },
   "common": {
     "delete": "Удалить",

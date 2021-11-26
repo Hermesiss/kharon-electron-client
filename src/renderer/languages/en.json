@@ -1,15 +1,28 @@
 {
   "apps": {
+    "app": {
+      "changes": "Changes",
+      "main": "Main",
+      "version": "Version",
+      "versions": "Versions"
+    },
     "editor": {
       "appCode": "App code",
       "appName": "App name",
+      "exeParams": "Launch parameters",
+      "exePath": "Exe path",
+      "ftpHost": "FTP host",
+      "ftpPath": "FTP path",
       "rootPath": "Root path",
       "title": {
         "create": "Create app",
         "edit": "Edit app"
       }
     },
-    "title": "Apps"
+    "title": "Apps",
+    "upload": {
+      "localPath": "Local path"
+    }
   },
   "common": {
     "delete": "Delete",

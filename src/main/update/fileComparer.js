@@ -4,7 +4,8 @@ const md5File = require('md5-file')
 
 const generateManifest = async (rootPath,
   settings = {ignoredFiles: [], ignoredExtensions: [], relativeResult: false}) => {
-  return await getAllFiles(rootPath, settings.relativeResult ? rootPath : null, settings)
+  const files = await getAllFiles(rootPath, settings.relativeResult ? rootPath : null, settings)
+  return {files}
 }
 
 const diffManifests = async (oldManifest, newManifest) => {
@@ -15,7 +16,7 @@ const diffManifests = async (oldManifest, newManifest) => {
   const changedFiles = oldManifest.filter(oldFile => {
     if (missingFiles.some(x => x.filePath === oldFile.filePath)) return false
     return !newManifest.some(newFile => newFile.filePath === oldFile.filePath &&
-    newFile.hash === oldFile.hash)
+      newFile.hash === oldFile.hash)
   })
 
   const movedFiles = []

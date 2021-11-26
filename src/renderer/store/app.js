@@ -24,6 +24,7 @@ export const state = () => ({
 
 export const mutations = {
   setApps(state, apps) {
+    console.log('SET APPS')
     state.apps = apps
   },
   setSelectedApp(state, selectedApp) {
@@ -33,8 +34,11 @@ export const mutations = {
     // noinspection JSCheckFunctionSignatures
     state.appConfigs[appCode] = new ElectronStore({name: `config-app-${appCode}`, schema: appConfigSchema})
   },
-  setFetching(state, fetching){
+  setFetching(state, fetching) {
     state.isFetching = fetching
+  },
+  setLastAppCount(state, lastAppCount) {
+    state.lastAppCount = lastAppCount
   }
 }
 
@@ -51,18 +55,23 @@ export const actions = {
       apps = c?.apps
     }
     context.commit('setFetching', true)
-    context.state.lastAppCount = apps.length
+    context.commit('setLastAppCount', apps.length)
+
+    const selected = context.state.selectedApp?.id
+
     const appArr = []
-    context.commit('setApps', [])
+    
     const configs = context.state.appConfigs
     for (const appsKey of apps) {
       const appInfo = await context.dispatch('getApp', appsKey)
       appArr.push(appInfo)
+      if (selected && selected === appsKey) {
+        context.commit('setSelectedApp', appInfo)
+      }
       if (!configs[appInfo.appCode]) {
         context.commit('addConfig', appInfo.appCode)
       }
     }
-
     context.commit('setApps', appArr)
     context.commit('setFetching', false)
   },
@@ -93,5 +102,17 @@ export const actions = {
   async deleteApp(state, appId) {
     const resp = await this.$axios.$delete(`/apps/${appId}`)
     return resp.data
+  },
+  async addVersion(state, {appId, version, changes}) {
+    const resp = await this.$axios.$post(`/apps/${appId}/version`, {version, changes})
+    return resp.date
+  },
+  async updateVersion(state, {appId, version, changes}) {
+    const resp = await this.$axios.$put(`/apps/${appId}/version`, {version, changes})
+    return resp.date
+  },
+  async deleteVersion(state, {appId, version}) {
+    const resp = await this.$axios.$delete(`/apps/${appId}/version/${version}`)
+    return resp.date
   },
 }

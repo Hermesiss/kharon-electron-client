@@ -3,7 +3,7 @@
   <NuxtLink to="login">LOGIN</NuxtLink>-->
   <v-container fluid fill-height class="pa-0">
     <v-row class="fill-height" no-gutters>
-      <v-col v-if="isAdmin" cols="4" class="fill-height py-0">
+      <v-col v-if="isAdmin" cols="auto" class="fill-height py-0">
         <companies fill-height class="elevation-4"/>
       </v-col>
       <v-col v-if="getSelectedCompany" cols="auto" class="fill-height py-0">
