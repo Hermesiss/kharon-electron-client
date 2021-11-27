@@ -89,6 +89,7 @@
 
 <script>
 import path from 'path'
+import fs from 'fs'
 import {mapActions, mapGetters, mapMutations, mapState} from 'vuex'
 import humanize from 'humanize'
 import {ipcRenderer} from 'electron'
@@ -170,6 +171,10 @@ export default {
     this.updateNewVersion()
     ipcRenderer.on('ftp-uploaded', (event, state) => {
       this.uploadState = state
+    })
+
+    ipcRenderer.on('app-download-progress', (_, progress) => {
+      this.uploadState = progress
     })
   },
   methods: {
@@ -268,9 +273,17 @@ export default {
       }
     },
     async startDownload(version) {
+      this.showUploadProcess = true
       const manifest = await this.downloadManifest({app: this.selectedApp, versionCode: version})
-      console.log(manifest)
-      await ipcRenderer.invoke('download-app', manifest, this.selectedApp, `C:/Temp/${this.selectedApp.appCode}`)
+
+      const appPath = `C:/Temp/${this.selectedApp.appCode}`
+      let diff = null
+      if (fs.existsSync(appPath)) {
+        const currentManifest = await ipcRenderer.invoke('manifest-generate', appPath)
+        diff = await ipcRenderer.invoke('manifest-diff', currentManifest, manifest)
+      }
+      await ipcRenderer.invoke('download-app', manifest, this.selectedApp, appPath, diff)
+      this.showUploadProcess = false
     }
   }
 }

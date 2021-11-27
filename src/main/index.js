@@ -158,13 +158,43 @@ ipcMain.handle('manifest-diff', async (event, oldManifest, newManifest) => {
   return await diffManifests(oldManifest, newManifest)
 })
 
-ipcMain.handle('download-app', async (event, manifest, app, filePath) => {
+ipcMain.handle('download-app', async (event, manifest, app, filePath, diff) => {
   const win = BrowserWindow.getFocusedWindow()
   const webContents = require('electron').webContents.getFocusedWebContents()
-  const totalSize = manifest.files.reduce((a, x) => a + x.fileSize, 0)
+
+  console.log(manifest)
+
+  let filesForDownload = null
+
+  if (diff) {
+    for (const movedFile of diff.movedFiles) {
+      const from = path.resolve(filePath, movedFile.from.filePath)
+      for (const toElement of movedFile.to) {
+        const to = path.resolve(filePath, toElement)
+        const dir = path.dirname(to)
+        fs.ensureDirSync(dir)
+        fs.copyFileSync(from, to)
+      }
+      fs.unlinkSync(from)
+    }
+    for (const missingFile of diff.missingFiles) {
+      const from = path.resolve(filePath, missingFile.filePath)
+      fs.unlinkSync(from)
+    }
+    filesForDownload = manifest.files.filter(x => diff.newFiles.some(z => z.filePath === x.filePath) ||
+      diff.changedFiles.some(z => z.filePath === x.filePath)
+    )
+  } else {
+    filesForDownload = manifest.files
+  }
+
+  const totalSize = filesForDownload.reduce((a, x) => a + x.fileSize, 0)
+  let fileCount = 0
   let downloaded = 0
 
-  for (const manifestElement of manifest.files) {
+  for (const manifestElement of filesForDownload) {
+    fileCount++
+    console.log(manifestElement)
     const version = manifestElement.version
     const baseUrl = `${app.rootPath}/${app.appCode}/${version}`
     const url = `${baseUrl}/${manifestElement.filePath}`
@@ -178,9 +208,13 @@ ipcMain.handle('download-app', async (event, manifest, app, filePath) => {
       directory: path.dirname(fullLocalPath),
       showBadge: false,
       onProgress: currentProgress => {
-        currentProgress.totalBulkBytes = totalSize
-        currentProgress.totalTransferredBytes = currentProgress.transferredBytes + downloaded
-        currentProgress.totalPercent = currentProgress.totalTransferredBytes / currentProgress.totalBulkBytes * 100
+        currentProgress.totalBytes = totalSize
+        currentProgress.bytes = currentProgress.transferredBytes + downloaded
+        currentProgress.percent = currentProgress.bytes / currentProgress.totalBytes * 100
+        currentProgress.count = fileCount
+        currentProgress.totalCount = filesForDownload.length
+        currentProgress.currentFileSize = manifestElement.fileSize
+        currentProgress.currentFilePath = manifestElement.filePath
         webContents.send('app-download-progress', currentProgress)
       },
     })

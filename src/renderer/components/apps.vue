@@ -144,7 +144,7 @@ export default {
     }
   },
   mounted() {
-    ipcRenderer.on('app-download-progress', (_, progress) => console.log('RENDERER PROGRESS', progress.totalPercent))
+
   },
   methods: {
     ...mapActions({
