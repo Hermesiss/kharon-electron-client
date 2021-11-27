@@ -1,90 +1,105 @@
 <template>
-  <v-list>
+  <div>
     <v-btn v-if="isAdmin" @click="uploadDialog = !uploadDialog">Upload</v-btn>
-    <v-list-item v-for="version in selectedApp.versions" :key="version.version">
-      <v-list-item-title>{{ version.version }}</v-list-item-title>
-      <v-list-item-subtitle>{{ getDate(version) }}</v-list-item-subtitle>
-      <v-list-item-action>
-        <v-btn v-if="isAdmin" icon @click="deleteSelectedVersion(version)">
-          <v-icon>mdi-delete</v-icon>
-        </v-btn>
-        <v-btn icon @click.prevent.stop="startDownload(version.version)">
-          <v-icon>mdi-download</v-icon>
-        </v-btn>
-      </v-list-item-action>
-    </v-list-item>
-    <v-dialog
-      v-model="uploadDialog"
-      persistent
-      min-width="600"
-      max-width="1200"
-    >
-      <v-card>
-        <v-card-title>
-          Upload new version
-        </v-card-title>
-        <v-card-text>
-          <v-text-field v-model="newVersion"
-                        :label="$t('apps.app.version')"
-                        :error-messages="isVersionAvailable ? [] : ['Version in use']"
-                        :error="!isVersionAvailable"
-          />
-          <v-text-field v-model="newChanges" :label="$t('apps.app.changes')"/>
-
-          <v-text-field :value="selectedPath" readonly disabled :label="$t('apps.upload.localPath')">
-            <template #prepend>
-              <v-btn icon @click="browseFolder">
-                <v-icon>mdi-folder-open</v-icon>
-              </v-btn>
-            </template>
-          </v-text-field>
-
-          <h2>FTP <small> {{ getFtpUrl }} </small></h2>
-          <v-text-field v-model="ftpUsername" :label="$t('login.username')"/>
-          <v-text-field v-model="ftpPassword" :label="$t('login.password')"
-                        :append-icon="showFtpPassword ? 'mdi-eye' : 'mdi-eye-off'"
-                        :type="showFtpPassword ? 'text' : 'password'"
-                        @click:append="showFtpPassword = !showFtpPassword"
-          />
-        </v-card-text>
-        <v-card-actions>
-          <v-spacer/>
-          <v-btn
-            color="green darken-1"
-            text
-            @click="uploadDialog = false"
-          >
-            {{ $t('common.discard') }}
+    <v-list class="overflow-y-auto my-scrollable-list">
+      <v-list-item v-for="version in selectedApp.versions" :key="version.version"
+                   :class="isVersionInstalled(version.version)? 'installed-version' : ''"
+                   class="pl-2"
+      >
+        <v-list-item-title>{{ version.version }}</v-list-item-title>
+        <v-list-item-subtitle>{{ getDate(version) }}</v-list-item-subtitle>
+        <v-list-item-action>
+          <v-btn v-if="isAdmin" icon @click="deleteSelectedVersion(version)">
+            <v-icon>mdi-delete</v-icon>
           </v-btn>
-          <v-btn
-            color="green darken-1"
-            text
-            @click="startUploading"
+          <v-btn :disabled="isVersionInstalled(version.version)" icon
+                 @click.prevent.stop="startDownload(version.version)"
           >
-            {{ $t('common.submit') }}
+            <v-icon>mdi-download</v-icon>
           </v-btn>
-        </v-card-actions>
-      </v-card>
-    </v-dialog>
-    <v-dialog
-      v-model="showUploadProcess"
-      max-width="600"
-      persistent
-    >
-      <v-card>
-        <v-card-title>Upload</v-card-title>
-        <v-card-text>
-          <v-progress-linear :value="uploadState.percent"
-                             height="25"
-          >
-            {{ uploadState.count }} / {{ uploadState.totalCount }}
-          </v-progress-linear>
-          <p>{{ getFileState }}</p>
-          <p>{{ uploadState.currentFilePath }}: {{ getCurrentSize }}</p>
-        </v-card-text>
-      </v-card>
-    </v-dialog>
-  </v-list>
+        </v-list-item-action>
+      </v-list-item>
+      <v-dialog
+        v-model="uploadDialog"
+        persistent
+        min-width="600"
+        max-width="1200"
+      >
+        <v-card>
+          <v-card-title>
+            Upload new version
+          </v-card-title>
+          <v-card-text>
+            <v-text-field v-model="newVersion"
+                          :label="$t('apps.app.version')"
+                          :error-messages="isVersionAvailable ? [] : ['Version in use']"
+                          :error="!isVersionAvailable"
+            />
+            <v-text-field v-model="newChanges" :label="$t('apps.app.changes')"/>
+
+            <v-text-field :value="selectedPath" readonly disabled :label="$t('apps.upload.localPath')">
+              <template #prepend>
+                <v-btn icon @click="browseFolder">
+                  <v-icon>mdi-folder-open</v-icon>
+                </v-btn>
+              </template>
+            </v-text-field>
+
+            <h2>FTP <small> {{ getFtpUrl }} </small></h2>
+            <v-text-field v-model="ftpUsername" :label="$t('login.username')"/>
+            <v-text-field v-model="ftpPassword" :label="$t('login.password')"
+                          :append-icon="showFtpPassword ? 'mdi-eye' : 'mdi-eye-off'"
+                          :type="showFtpPassword ? 'text' : 'password'"
+                          @click:append="showFtpPassword = !showFtpPassword"
+            />
+          </v-card-text>
+          <v-card-actions>
+            <v-spacer/>
+            <v-btn
+              color="green darken-1"
+              text
+              @click="uploadDialog = false"
+            >
+              {{ $t('common.discard') }}
+            </v-btn>
+            <v-btn
+              color="green darken-1"
+              text
+              @click="startUploading"
+            >
+              {{ $t('common.submit') }}
+            </v-btn>
+          </v-card-actions>
+        </v-card>
+      </v-dialog>
+      <v-dialog
+        v-model="showUploadProcess"
+        max-width="600"
+        persistent
+      >
+        <v-card>
+          <v-card-title/>
+          <v-card-text>
+            <v-progress-linear v-if="!uploadState"
+                               height="25"
+                               indeterminate
+            />
+            <div v-else>
+              <v-progress-linear
+                :value="uploadState.percent"
+                height="25"
+                :indeterminate="uploadState.indeterminate"
+              >
+                {{ uploadState.count }} / {{ uploadState.totalCount }}
+              </v-progress-linear>
+              <p>{{ getFileState }}</p>
+              <p>{{ uploadState.currentFilePath }}: {{ getCurrentSize }}</p>
+            </div>
+          </v-card-text>
+        </v-card>
+      </v-dialog>
+    </v-list>
+  </div>
 </template>
 
 <script>
@@ -119,7 +134,8 @@ export default {
     ...mapGetters({
       isAdmin: 'user/isAdmin',
       getApp: 'admin/getApp',
-      getFtp: 'admin/getFtp'
+      getFtp: 'admin/getFtp',
+      getAppConfig: 'app/getAppConfig'
     }),
     getFtpUrl() {
       return `ftp://${this.selectedApp.ftpHost}/${this.selectedApp.ftpPath}`
@@ -203,6 +219,8 @@ export default {
       this.newChanges = ''
 
       this.selectedPath = this.getApp(this.selectedApp.appCode)?.selectedPath
+
+      this.appConfig = this.getAppConfig(this.selectedApp.appCode)
     },
     async browseFolder() {
       const newFolder = await ipcRenderer.invoke('get-folder')
@@ -222,6 +240,8 @@ export default {
     },
     async startUploading() {
       console.log('WAITING FOR MANIFEST')
+      this.uploadState = null
+      this.showUploadProcess = true
 
       let latestManifest = null
       const latest = getLatest(this.selectedApp.versions)
@@ -239,7 +259,6 @@ export default {
 
       console.log('START UPLOADING')
 
-      this.showUploadProcess = true
       const upload = await ipcRenderer.invoke('upload-ftp', {
         appCode: this.selectedApp.appCode,
         version: this.newVersion,
@@ -273,10 +292,17 @@ export default {
       }
     },
     async startDownload(version) {
+      this.appConfig?.set('version', version)
+      this.appConfig?.set('installed', true)
+      this.appConfig?.set('downloaded', false)
+      const appPath = `C:/Temp/${this.selectedApp.appCode}`
+      this.appConfig?.set('installedPath', appPath)
+
+      this.uploadState = null
       this.showUploadProcess = true
+
       const manifest = await this.downloadManifest({app: this.selectedApp, versionCode: version})
 
-      const appPath = `C:/Temp/${this.selectedApp.appCode}`
       let diff = null
       if (fs.existsSync(appPath)) {
         const currentManifest = await ipcRenderer.invoke('manifest-generate', appPath)
@@ -284,11 +310,20 @@ export default {
       }
       await ipcRenderer.invoke('download-app', manifest, this.selectedApp, appPath, diff)
       this.showUploadProcess = false
+      this.appConfig?.set('downloaded', true)
+    },
+    isVersionInstalled(version) {
+      return this.appConfig?.get('version') === version
     }
   }
 }
 </script>
 
-<style scoped>
+<style scoped lang="sass">
+@import '~vuetify/src/styles/main.sass'
+.my-scrollable-list
+  max-height: calc(100vh - 300px)
 
+.installed-version
+  background-color: map-get($deep-purple, lighten-5)
 </style>

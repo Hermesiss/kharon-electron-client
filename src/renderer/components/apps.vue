@@ -31,6 +31,7 @@
             <v-list-item-subtitle>[{{ app.appCode }}]: {{ getVersion(app) }}</v-list-item-subtitle>
           </v-list-item-content>
           <v-list-item-action>
+            {{ appInstalled(app.appCode) }}
             <v-btn v-if="isAdmin" icon @click.prevent.stop="openEditDialogue(app)">
               <v-icon>mdi-pencil</v-icon>
             </v-btn>
@@ -110,8 +111,6 @@
 
 <script>
 import {mapActions, mapGetters, mapMutations, mapState} from 'vuex'
-import {ipcRenderer} from 'electron'
-import {getLatest} from "../plugins/helpers";
 
 export default {
   name: 'Apps',
@@ -123,7 +122,8 @@ export default {
   computed: {
     ...mapGetters({
       userRole: 'user/currentUserRole',
-      isAdmin: 'user/isAdmin'
+      isAdmin: 'user/isAdmin',
+      getAppConfig: 'app/getAppConfig'
     }),
     ...mapState({
       apps: state => state.app.apps,
@@ -153,10 +153,10 @@ export default {
       deleteApp: 'app/deleteApp',
       fetchApps: 'app/fetchApps',
       fetchCompanies: 'company/fetchCompanies',
-      downloadManifest: 'app/downloadManifest'
+      downloadManifest: 'app/downloadManifest',
     }),
     ...mapMutations({
-      setSelectedApp: 'app/setSelectedApp'
+      setSelectedApp: 'app/setSelectedApp',
     }),
     openEditDialogue(app) {
       this.editedApp = {...app}
@@ -194,6 +194,11 @@ export default {
 
       return 'No version'
     },
+    appInstalled(appCode) {
+      const appConfig = this.getAppConfig(appCode)
+      console.log(appConfig)
+      return appConfig.get('installed')
+    }
   }
 }
 </script>

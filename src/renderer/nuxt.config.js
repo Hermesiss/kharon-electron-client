@@ -72,13 +72,23 @@ module.exports = {
     customVariables: ['~/assets/variables.scss'],
     treeShake: true,
     theme: {
+      dark: false,
       themes: {
         light: {
           primary: '#1867c0',
           secondary: '#b0bec5',
           accent: '#8c9eff',
           error: '#b71c1c'
-        }
+        },
+        dark: {
+          primary: '#BEA7E5',
+          accent: '#5998C5',
+          secondary: '#8A8D93',
+          success: '#809905',
+          info: '#2274A5',
+          warning: '#FA9005',
+          error: '#E03616',
+        },
       }
     }
   }

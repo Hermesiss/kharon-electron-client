@@ -1,2 +1,164 @@
 /*$btn-border-radius: 0px;*/
 $border-radius-root: 0px;
+/*
+$shades: (
+  'black': #5e5669,
+  'white': #fff,
+  'transparent': transparent,
+);
+
+$primary-shade--dark: #e7e3fc;
+$shadow-color--dark: #131120;
+
+@import '~vuetify/src/styles/styles.sass';
+
+$material-dark: map-deep-merge(
+    $material-dark,
+    (
+      'calendar': (
+        'text-color': $primary-shade--dark,
+        'past-color': rgba($primary-shade--dark, 0.5),
+      ),
+      'code': (
+        'background': rgba($primary-shade--dark, 0.1),
+      ),
+      'kbd': (
+        'color': $primary-shade--dark,
+      ),
+      'dividers': rgba($primary-shade--dark, 0.12),
+      'text': (
+        'theme': $primary-shade--dark,
+        'primary': $primary-shade--dark,
+        'secondary': rgba($primary-shade--dark, 0.7),
+        'disabled': rgba($primary-shade--dark, 0.5),
+      ),
+      'icons': (
+        'active': $primary-shade--dark,
+        'inactive': rgba($primary-shade--dark, 0.5),
+      ),
+      'inputs': (
+        'box': $primary-shade--dark,
+        'solo-inverted': rgba($primary-shade--dark, 0.16),
+        'solo-inverted-focused': $primary-shade--dark,
+      ),
+      'buttons': (
+        'disabled': rgba($primary-shade--dark, 0.3),
+        'focused': rgba($primary-shade--dark, 0.12),
+        'focused-alt': rgba($primary-shade--dark, 0.1),
+      ),
+      'selection-controls': (
+        'disabled': rgba($primary-shade--dark, 0.3),
+        'track': (
+          'inactive': rgba($primary-shade--dark, 0.3),
+          'disabled': rgba($primary-shade--dark, 0.1),
+        ),
+      ),
+      'slider': (
+        'active': rgba($primary-shade--dark, 0.3),
+        'inactive': rgba($primary-shade--dark, 0.2),
+        'disabled': rgba($primary-shade--dark, 0.2),
+        'discrete': $primary-shade--dark,
+      ),
+      'tabs': rgba($primary-shade--dark, 0.6),
+      'toggle-buttons': (
+        'color': $primary-shade--dark,
+      ),
+      'text-fields': (
+        'filled': rgba($primary-shade--dark, 0.08),
+        'filled-hover': rgba($primary-shade--dark, 0.16),
+        'outlined': rgba($primary-shade--dark, 0.24),
+        'outlined-disabled': rgba($primary-shade--dark, 0.16),
+        'outlined-hover': $primary-shade--dark,
+      ),
+      'input-bottom-line': rgba($primary-shade--dark, 0.7),
+      'stepper': (
+        'active': rgba($primary-shade--dark, 1),
+        'completed': rgba($primary-shade--dark, 0.87),
+        'hover': rgba($primary-shade--dark, 0.75),
+      ),
+      'color-picker': (
+        'checkerboard': rgba($primary-shade--dark, 0.12),
+      ),
+      'fg-color': $primary-shade--dark,
+      'text-color': $primary-shade--dark,
+    )
+);
+
+// #endregion
+
+//
+/!* ——— Override Values of Dark Theme ——————————————————
+//
+
+// #region Override Dark Theme
+
+$material-dark: map-deep-merge(
+    $material-dark,
+    (
+      // ! Value of `map-deep-get($material-dark, 'cards')`
+      'app-bar': #242238,
+      'background': #191726,
+      'cards': #242238,
+      'calendar': (
+        // ! Value of `map-deep-get($material-dark, 'cards')`
+        'background-color': #242238,
+        'line-color': rgba(247, 244, 254, 0.14),
+        // ! Value of `map-deep-get($material-dark, 'cards')`
+        'outside-background-color': transparent
+      ),
+      'chips': rgba($primary-shade--dark, 0.06),
+      'dividers': rgba($primary-shade--dark, 0.14),
+      'input-bottom-line': rgba($primary-shade--dark, 0.14),
+      'inputs': (
+        // ! Value of `map-deep-get($material-dark, 'text-fields', 'filled')`
+        'solo-inverted': rgba($primary-shade--dark, 0.03)
+      ),
+      // ! Value of `map-deep-get($material-dark, 'cards')`
+      'navigation-drawer': #242238,
+      'table': (
+        'active': rgba($primary-shade--dark, 0.08),
+        'hover': rgba($primary-shade--dark, 0.04),
+        // 'group': map-get($grey, 'lighten-3'),,,,,,,,,,
+      ),
+      'tabs': rgba($primary-shade--dark, 0.76),
+      'text': (
+        // ! It is only used in pagination
+        'theme': map-get($shades, 'white'),
+        'primary': rgba($primary-shade--dark, 0.87),
+        'secondary': rgba($primary-shade--dark, 0.68)
+      ),
+      'text-fields': (
+        'filled': rgba($primary-shade--dark, 0.03),
+        'filled-hover': rgba($primary-shade--dark, 0.08),
+        'outlined': rgba($primary-shade--dark, 0.22),
+        'outlined-hover': rgba($primary-shade--dark, 0.28),
+        'outlined-disabled': rgba($primary-shade--dark, 0.22),
+      ),
+      'selection-controls': (
+        'thumb': (
+          'inactive': #e0e0e0,
+        ),
+      ),
+      'status-bar': (
+        // ! Value of `map-deep-get($material-dark, 'cards')`
+        'regular': #242238
+      ),
+      'icons': (
+        // ! Value of `map-deep-get($material-light, 'text', 'secondary')`
+        'active': rgba($primary-shade--dark, 0.68)
+      ),
+      'picker': (
+        // ! Value of `map-deep-get($material-dark, 'background')`
+        'body': #191726,
+        // ! Value of `map-deep-get($material-dark, 'cards')`
+        'clock': #242238,
+        // ! Value of `map-deep-get($material-dark, 'background')`
+        'indeterminateTime': #191726
+      ),
+      // ! Value of `map-deep-get($material-dark, 'cards')`
+      'bg-color': #242238,
+      // * New
+      'primary-shade': $primary-shade--dark,
+      'shadow-color': $shadow-color--dark
+    )
+);*/

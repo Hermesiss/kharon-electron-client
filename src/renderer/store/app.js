@@ -1,5 +1,5 @@
 import ElectronStore from 'electron-store'
-import {ipcRenderer} from "electron";
+import {ipcRenderer} from 'electron'
 
 const mainStoreSchema = {
   apps: {type: 'array', default: []}
@@ -7,6 +7,8 @@ const mainStoreSchema = {
 
 const appConfigSchema = {
   installed: {type: 'boolean', default: false},
+  downloaded: {type: 'boolean', default: false},
+  version: {type: 'string', default: '0.0.0'},
   installedPath: {type: 'string', default: ''},
   settings: {type: 'array', default: []}
 }
@@ -47,6 +49,9 @@ export const getters = {
   getAppById: state => id => {
     return state.apps.find(c => c.id === id)
   },
+  getAppConfig: state => appCode => {
+    return state.appConfigs[appCode]
+  }
 }
 
 export const actions = {
@@ -123,5 +128,5 @@ export const actions = {
   },
   async diffManifests(state, {oldManifest, newManifest}) {
     return await ipcRenderer.invoke('manifest-diff', oldManifest, newManifest)
-  }
+  },
 }
