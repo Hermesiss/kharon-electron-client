@@ -34,9 +34,6 @@
             <v-btn v-if="isAdmin" icon @click.prevent.stop="openEditDialogue(app)">
               <v-icon>mdi-pencil</v-icon>
             </v-btn>
-            <v-btn icon @click.prevent.stop="startDownload(app)">
-              <v-icon>mdi-download</v-icon>
-            </v-btn>
           </v-list-item-action>
         </v-list-item>
       </v-list-item-group>
@@ -114,6 +111,7 @@
 <script>
 import {mapActions, mapGetters, mapMutations, mapState} from 'vuex'
 import {ipcRenderer} from 'electron'
+import {getLatest} from "../plugins/helpers";
 
 export default {
   name: 'Apps',
@@ -154,7 +152,8 @@ export default {
       updateApp: 'app/updateApp',
       deleteApp: 'app/deleteApp',
       fetchApps: 'app/fetchApps',
-      fetchCompanies: 'company/fetchCompanies'
+      fetchCompanies: 'company/fetchCompanies',
+      downloadManifest: 'app/downloadManifest'
     }),
     ...mapMutations({
       setSelectedApp: 'app/setSelectedApp'
@@ -195,9 +194,6 @@ export default {
 
       return 'No version'
     },
-    async startDownload(app) {
-      await ipcRenderer.invoke('download-app', app, 'C:/Temp')
-    }
   }
 }
 </script>

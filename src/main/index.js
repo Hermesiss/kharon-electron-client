@@ -15,7 +15,6 @@ app.on('window-all-closed', function () {
 })
 
 app.on('browser-window-created', (event, win) => {
-  console.log('WINDOW CREATED', event, win)
   if (!isDev) win.removeMenu()
 })
 
@@ -40,9 +39,6 @@ ipcMain.handle('upload-ftp', async (event, params) => {
   client.ftp.verbose = true
   let isSuccess = false
 
-  const totalBytes = manifest.files.reduce((a, x) => a + x.fileSize, 0)
-  let uploadedBytes = 0
-
   try {
     const result = await client.access({
       host: params.host,
@@ -55,10 +51,17 @@ ipcMain.handle('upload-ftp', async (event, params) => {
     const remoteDirPath = [ftpPath, appCode, version.toString()].join('/')
     console.log('REMOTE PATH', remoteDirPath)
     await client.ensureDir(remoteDirPath)
-
-    const manifestLength = manifest.files.length
+    await client.clearWorkingDir()
+    const actualFiles = manifest.files.filter(x => x.version === version)
+    actualFiles.push({
+      filePath: 'manifest.json',
+      fileSize: 10000
+    })
+    const totalBytes = actualFiles.reduce((a, x) => a + x.fileSize, 0)
+    let uploadedBytes = 0
+    const manifestLength = actualFiles.length
     for (let i = 0; i < manifestLength; i++) {
-      const manifestElement = manifest.files[i]
+      const manifestElement = actualFiles[i]
       const from = path.join(selectedPath, manifestElement.filePath)
       const to = [remoteDirPath, manifestElement.filePath].join('/').replaceAll('\\', '/')
       const toDir = path.dirname(to)
@@ -111,17 +114,42 @@ ipcMain.handle('install-update', async () => {
 
 const {generateManifest, diffManifests} = require('./update/fileComparer')
 
-ipcMain.handle('manifest-generate', async (event, directory, savePath) => {
+ipcMain.handle('manifest-generate', async (event, directory, savePath, oldManifest, newVersion) => {
   const manifest = await generateManifest(directory, {
-    ignoredFiles: ['file.json'],
+    ignoredFiles: ['manifest.json', 'diff.json'],
     ignoredExtensions: [],
     relativeResult: true
   })
+  let diff = null
+  if (oldManifest) {
+    diff = await diffManifests(oldManifest, manifest)
+  }
+
+  for (let i = 0; i < manifest.files.length; i++) {
+    const file = manifest.files[i]
+    if (diff) {
+      const fromOldManifest = oldManifest.files.find(x => x.filePath === file.filePath)
+      console.log(fromOldManifest)
+      if (fromOldManifest && fromOldManifest.version) {
+        if (diff.newFiles.some(x => x.filePath === file.filePath) ||
+          diff.changedFiles.some(x => x.filePath === file.filePath) ||
+          diff.movedFiles.some(x => x.to.includes(file.filePath))) {
+          manifest.files[i].version = newVersion
+        } else {
+          manifest.files[i].version = fromOldManifest.version
+        }
+        continue
+      }
+    }
+    manifest.files[i].version = newVersion
+  }
+
   if (savePath) {
     const dirname = path.dirname(savePath)
     console.log('DIRNAME', dirname)
     fs.ensureDirSync(dirname)
     fs.writeFileSync(savePath, JSON.stringify(manifest))
+    fs.writeFileSync(path.join(dirname, 'diff.json'), JSON.stringify(diff))
   }
   return manifest
 })
@@ -130,24 +158,22 @@ ipcMain.handle('manifest-diff', async (event, oldManifest, newManifest) => {
   return await diffManifests(oldManifest, newManifest)
 })
 
-ipcMain.handle('download-app', async (event, app, filePath) => {
+ipcMain.handle('download-app', async (event, manifest, app, filePath) => {
   const win = BrowserWindow.getFocusedWindow()
   const webContents = require('electron').webContents.getFocusedWebContents()
-  const version = app.versions[0].version
-  const baseUrl = `${app.rootPath}/${app.appCode}/${version}`
-  const manifestUrl = `${baseUrl}/manifest.json`
-  const response = await fetch(manifestUrl)
-  const manifest = await response.json()
   const totalSize = manifest.files.reduce((a, x) => a + x.fileSize, 0)
   let downloaded = 0
 
   for (const manifestElement of manifest.files) {
+    const version = manifestElement.version
+    const baseUrl = `${app.rootPath}/${app.appCode}/${version}`
     const url = `${baseUrl}/${manifestElement.filePath}`
     const fullLocalPath = path.resolve(filePath, manifestElement.filePath)
     if (fs.existsSync(fullLocalPath)) {
       fs.unlinkSync(fullLocalPath)
     }
 
+    console.log(`Downloading from ${url}`)
     await download(win, url, {
       directory: path.dirname(fullLocalPath),
       showBadge: false,

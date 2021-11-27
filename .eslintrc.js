@@ -15,7 +15,13 @@ module.exports = {
   // add your custom rules here
   rules: {
     // StandardJS — The Rules
-    indent: ['error', 2, { SwitchCase: 1 }], // 2 spaces – for indentation
+    indent: ['error', 2, {
+      SwitchCase: 1,
+      outerIIFEBody: 'off',
+      ObjectExpression: 'off',
+      FunctionExpression: {parameters: 'first'}
+
+    }], // 2 spaces – for indentation
     'max-len': ['error', {code: 120}],
     'no-console': 'off',
     'arrow-parens': ['error', 'as-needed'],

@@ -1,4 +1,5 @@
 import ElectronStore from 'electron-store'
+import {ipcRenderer} from "electron";
 
 const mainStoreSchema = {
   apps: {type: 'array', default: []}
@@ -60,7 +61,7 @@ export const actions = {
     const selected = context.state.selectedApp?.id
 
     const appArr = []
-    
+
     const configs = context.state.appConfigs
     for (const appsKey of apps) {
       const appInfo = await context.dispatch('getApp', appsKey)
@@ -115,4 +116,12 @@ export const actions = {
     const resp = await this.$axios.$delete(`/apps/${appId}/version/${version}`)
     return resp.date
   },
+  async downloadManifest(state, {app, versionCode}) {
+    const baseUrl = `${app.rootPath}/${app.appCode}/${versionCode}`
+    const manifestUrl = `${baseUrl}/manifest.json`
+    return await this.$axios.$get(manifestUrl)
+  },
+  async diffManifests(state, {oldManifest, newManifest}) {
+    return await ipcRenderer.invoke('manifest-diff', oldManifest, newManifest)
+  }
 }

@@ -8,6 +8,9 @@
         <v-btn v-if="isAdmin" icon @click="deleteSelectedVersion(version)">
           <v-icon>mdi-delete</v-icon>
         </v-btn>
+        <v-btn icon @click.prevent.stop="startDownload(version.version)">
+          <v-icon>mdi-download</v-icon>
+        </v-btn>
       </v-list-item-action>
     </v-list-item>
     <v-dialog
@@ -89,7 +92,7 @@ import path from 'path'
 import {mapActions, mapGetters, mapMutations, mapState} from 'vuex'
 import humanize from 'humanize'
 import {ipcRenderer} from 'electron'
-import semver from 'semver'
+import {getLatest} from '../../plugins/helpers'
 
 export default {
   name: 'Versions',
@@ -177,7 +180,9 @@ export default {
     ...mapActions({
       addVersion: 'app/addVersion',
       deleteVersion: 'app/deleteVersion',
-      fetchApps: 'app/fetchApps'
+      fetchApps: 'app/fetchApps',
+      downloadManifest: 'app/downloadManifest',
+      diffManifests: 'app/diffManifests'
     }),
     getDate(version) {
       const date = new Date(version.date)
@@ -185,7 +190,7 @@ export default {
     },
     updateNewVersion() {
       if (this.selectedApp.versions.length > 0) {
-        this.newVersion = this.selectedApp.versions.map(x => x.version).sort(semver.rcompare)[0]
+        this.newVersion = getLatest(this.selectedApp.versions)
       } else {
         this.newVersion = '0.0.1'
       }
@@ -212,8 +217,20 @@ export default {
     },
     async startUploading() {
       console.log('WAITING FOR MANIFEST')
-      const manifest = await ipcRenderer.invoke('manifest-generate', this.selectedPath,
-        path.join(this.selectedPath, 'manifest.json'))
+
+      let latestManifest = null
+      const latest = getLatest(this.selectedApp.versions)
+      if (latest) {
+        latestManifest = await this.downloadManifest({app: this.selectedApp, versionCode: latest})
+        // const diff = await this.diffManifests({oldManifest: latestManifest, newManifest: manifest})
+      }
+
+      const manifest = await ipcRenderer.invoke('manifest-generate',
+        this.selectedPath,
+        path.join(this.selectedPath, 'manifest.json'),
+        latestManifest,
+        this.newVersion
+      )
 
       console.log('START UPLOADING')
 
@@ -244,11 +261,16 @@ export default {
     async deleteSelectedVersion(version) {
       if (confirm(`Are you sure you want to delete version "${version.version}"?`)) {
         await this.deleteVersion({
-            appId: this.selectedApp.id, version: version.version
-          }
-        )
+          appId: this.selectedApp.id,
+          version: version.version
+        })
         await this.fetchApps()
       }
+    },
+    async startDownload(version) {
+      const manifest = await this.downloadManifest({app: this.selectedApp, versionCode: version})
+      console.log(manifest)
+      await ipcRenderer.invoke('download-app', manifest, this.selectedApp, `C:/Temp/${this.selectedApp.appCode}`)
     }
   }
 }
