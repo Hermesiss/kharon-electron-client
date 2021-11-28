@@ -13,7 +13,8 @@ export const state = () => ({
   downloadSize: 0,
   downloadProgress: 0,
   isFetching: false,
-  isDownloading: false
+  isDownloading: false,
+  appToInstall: {app: null, version: null}
 })
 
 export const mutations = {
@@ -42,6 +43,9 @@ export const mutations = {
   },
   setDownloadProgress(state, progress) {
     state.downloadProgress = progress
+  },
+  setAppToInstall(state, {app, version}) {
+    state.appToInstall = {app, version}
   }
 }
 

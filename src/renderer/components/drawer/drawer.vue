@@ -27,19 +27,28 @@
             </v-btn>
           </v-list-item-action>
         </v-list-item>
-        <drawer-list-item v-for="page in pages" :key="page.path" :caption="page.captionKey" :icon="page.icon"
+        <drawer-list-item v-for="page in pages"
+                          :key="page.path"
+                          :caption="page.captionKey"
+                          :icon="page.icon"
                           :path="page.path"
+                          :v-if="isRoleSatisfies(page.rolesOnly)"
         />
       </v-list>
     </v-layout>
     <template #append>
       <v-list>
-        <drawer-list-item v-for="page in bottomPages" :key="page.path" :caption="page.captionKey" :icon="page.icon"
+        <drawer-list-item v-for="page in bottomPages"
+                          :key="page.path"
+                          :caption="page.captionKey"
+                          :icon="page.icon"
                           :path="page.path"
+                          :v-if="isRoleSatisfies(page.rolesOnly)"
         />
 
         <drawer-list-item caption="settings.title" icon="mdi-cog"
                           path="/settings" :badge-value="!isActual"
+                          badge-color="accent"
         />
       </v-list>
     </template>
@@ -70,7 +79,8 @@ export default {
   computed: {
     ...mapGetters({
       userRole: 'user/currentUserRole',
-      isActual: 'download/isActual'
+      isActual: 'download/isActual',
+      isRoleSatisfies: 'user/isRoleSatisfies'
     }),
     isLogged() {
       return this.$auth.loggedIn

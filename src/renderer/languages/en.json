@@ -19,6 +19,13 @@
         "edit": "Edit app"
       }
     },
+    "menu": {
+      "download": "Download",
+      "edit": "Edit",
+      "install": "Install",
+      "launch": "Launch",
+      "update": "Update"
+    },
     "title": "Apps",
     "upload": {
       "localPath": "Local path"

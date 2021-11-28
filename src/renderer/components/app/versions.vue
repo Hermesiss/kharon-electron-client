@@ -188,15 +188,12 @@ export default {
     ipcRenderer.on('ftp-uploaded', (event, state) => {
       this.uploadState = state
     })
-
-    ipcRenderer.on('app-download-progress', (_, progress) => {
-      this.uploadState = progress
-    })
   },
   methods: {
     ...mapMutations({
       setApp: 'admin/setApp',
-      setFtp: 'admin/setFtp'
+      setFtp: 'admin/setFtp',
+      setAppToInstall: 'download/setAppToInstall'
     }),
     ...mapActions({
       addVersion: 'app/addVersion',
@@ -247,7 +244,6 @@ export default {
       const latest = getLatest(this.selectedApp.versions)
       if (latest) {
         latestManifest = await this.downloadManifest({app: this.selectedApp, versionCode: latest})
-        // const diff = await this.diffManifests({oldManifest: latestManifest, newManifest: manifest})
       }
 
       const manifest = await ipcRenderer.invoke('manifest-generate',
@@ -292,25 +288,7 @@ export default {
       }
     },
     async startDownload(version) {
-      this.appConfig?.set('version', version)
-      this.appConfig?.set('installed', true)
-      this.appConfig?.set('downloaded', false)
-      const appPath = `C:/Temp/${this.selectedApp.appCode}`
-      this.appConfig?.set('installedPath', appPath)
-
-      this.uploadState = null
-      this.showUploadProcess = true
-
-      const manifest = await this.downloadManifest({app: this.selectedApp, versionCode: version})
-
-      let diff = null
-      if (fs.existsSync(appPath)) {
-        const currentManifest = await ipcRenderer.invoke('manifest-generate', appPath)
-        diff = await ipcRenderer.invoke('manifest-diff', currentManifest, manifest)
-      }
-      await ipcRenderer.invoke('download-app', manifest, this.selectedApp, appPath, diff)
-      this.showUploadProcess = false
-      this.appConfig?.set('downloaded', true)
+      this.setAppToInstall({app: this.selectedApp, version})
     },
     isVersionInstalled(version) {
       return this.appConfig?.get('version') === version

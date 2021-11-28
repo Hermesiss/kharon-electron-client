@@ -11,14 +11,7 @@
       </v-btn>
     </v-card-title>
     <v-list>
-      <v-list-item-group v-if="isFetching">
-        <v-skeleton-loader v-for="index in skeletonNumber"
-                           :key="index"
-                           type="list-item-two-line"
-        />
-      </v-list-item-group>
       <v-list-item-group
-        v-else
         :value="selected"
         color="primary"
       >
@@ -28,13 +21,17 @@
         >
           <v-list-item-content>
             <v-list-item-title>{{ app.appName }}</v-list-item-title>
-            <v-list-item-subtitle>[{{ app.appCode }}]: {{ getVersion(app) }}</v-list-item-subtitle>
+            <v-list-item-subtitle>{{ getVersion(app) }}</v-list-item-subtitle>
           </v-list-item-content>
           <v-list-item-action>
-            {{ appInstalled(app.appCode) }}
-            <v-btn v-if="isAdmin" icon @click.prevent.stop="openEditDialogue(app)">
+            <v-badge bordered dot :value="updateAvailable(app)" color="accent">
+              <v-btn icon @click.prevent.stop="appInstalled(app.appCode) ? launchApp(app) : downloadAdd(app)">
+                <v-icon>{{ appInstalled(app.appCode) ? 'mdi-play' : 'mdi-download' }}</v-icon>
+              </v-btn>
+            </v-badge>
+            <!--            <v-btn v-if="isAdmin" icon @click.prevent.stop="openEditDialogue(app)">
               <v-icon>mdi-pencil</v-icon>
-            </v-btn>
+            </v-btn>-->
           </v-list-item-action>
         </v-list-item>
       </v-list-item-group>
@@ -111,6 +108,7 @@
 
 <script>
 import {mapActions, mapGetters, mapMutations, mapState} from 'vuex'
+import {getLatest} from '../plugins/helpers'
 
 export default {
   name: 'Apps',
@@ -130,7 +128,6 @@ export default {
       selectedApp: state => state.app.selectedApp,
       companies: state => state.company.companies,
       isFetching: state => state.app.isFetching,
-      skeletonNumber: state => state.app.lastAppCount
     }),
     selected() {
       return this.apps.indexOf(this.selectedApp)
@@ -157,6 +154,7 @@ export default {
     }),
     ...mapMutations({
       setSelectedApp: 'app/setSelectedApp',
+      setAppToInstall: 'download/setAppToInstall'
     }),
     openEditDialogue(app) {
       this.editedApp = {...app}
@@ -188,16 +186,27 @@ export default {
       return false
     },
     getVersion(app) {
-      if (app?.versions?.length > 0) {
-        return `v${app.versions[0].version}`
-      }
+      const appConfig = this.getAppConfig(app.appCode)
+      if (!appConfig?.get('installed')) return ''
 
-      return 'No version'
+      return appConfig?.get('version')
     },
     appInstalled(appCode) {
       const appConfig = this.getAppConfig(appCode)
-      console.log(appConfig)
-      return appConfig.get('installed')
+      return appConfig?.get('installed')
+    },
+    launchApp(app) {
+    },
+    downloadAdd(app) {
+      const version = getLatest(app.versions)
+      this.setAppToInstall({app, version})
+    },
+    updateAvailable(app) {
+      if (!this.appInstalled(app.appCode)) return false
+      const current = this.getVersion(app)
+      const latest = getLatest(app.versions)
+      console.log('versions', current, latest)
+      return latest !== current
     }
   }
 }

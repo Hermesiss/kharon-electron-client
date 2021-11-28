@@ -1,6 +1,4 @@
-export const state = () => ({
-
-})
+export const state = () => ({})
 
 export const getters = {
   /*
@@ -23,4 +21,9 @@ export const getters = {
   isAdmin: (state, getters) => {
     return getters.currentUserRole === 'admin'
   },
+  isRoleSatisfies: (state, getters) => roles => {
+    if (!roles) return true
+    const currentRole = getters.currentUserRole
+    return roles.includes(currentRole)
+  }
 }

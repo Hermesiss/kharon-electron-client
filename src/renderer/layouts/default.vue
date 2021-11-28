@@ -6,6 +6,7 @@
       </v-app-bar>-->
       <drawer/>
       <nuxt/>
+      <app-downloader/>
     </v-main>
   </v-app>
 </template>
@@ -14,9 +15,10 @@
 
 import {mapActions} from 'vuex'
 import Drawer from '~/components/drawer/drawer'
+import AppDownloader from '~/components/appDownloader'
 
 export default {
-  components: {Drawer},
+  components: {AppDownloader, Drawer},
   data() {
     return {}
   },
