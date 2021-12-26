@@ -1,5 +1,5 @@
 const path = require('path')
-const child_process = require('child_process')
+const childProcess = require('child_process')
 const fs = require('fs-extra')
 const {app, ipcMain, BrowserWindow, dialog, shell} = require('electron')
 const {download} = require('electron-dl')
@@ -165,12 +165,17 @@ ipcMain.handle('launch',
    * @param event
    * @param {KharonApp} kharonApp
    * @param {string} appPath
+   * @param {string} errorTitle
+   * @param {string} errorText
    * @return {Promise<void>}
    */
-  async (event, kharonApp, appPath) => {
+  async (event, kharonApp, appPath, errorTitle, errorText) => {
     const exePath = path.join(appPath, kharonApp.exePath)
+    if (!fs.existsSync(exePath)) {
+      dialog.showErrorBox(errorTitle, `${exePath}: ${errorText}`)
+    }
     console.log('LAUNCHING', exePath)
-    child_process.execFile(exePath);
+    childProcess.execFile(exePath)
   })
 
 ipcMain.handle('shortcuts-create',

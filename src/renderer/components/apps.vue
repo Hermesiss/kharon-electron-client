@@ -153,6 +153,7 @@ export default {
       fetchApps: 'app/fetchApps',
       fetchCompanies: 'company/fetchCompanies',
       downloadManifest: 'app/downloadManifest',
+      launch: 'app/launchApp'
     }),
     ...mapMutations({
       setSelectedApp: 'app/setSelectedApp',
@@ -216,10 +217,7 @@ export default {
      * @param {KharonApp} app
      */
     launchApp(app) {
-      const appConfig = this.getAppConfig(app.appCode)
-      console.log('APP CONFIG', appConfig)
-      if (!appConfig || !appConfig.get('installedPath')) return ''
-      ipcRenderer.invoke('launch', app, appConfig.get('installedPath'))
+      this.launch(app)
     },
     /**
      *

@@ -82,7 +82,7 @@
 </template>
 
 <script>
-import {mapGetters, mapMutations, mapState} from 'vuex'
+import {mapActions, mapGetters, mapMutations, mapState} from 'vuex'
 import {ipcRenderer} from 'electron'
 import {getLatest} from '../../plugins/helpers'
 import Versions from './versions'
@@ -130,6 +130,12 @@ export default {
           icon: 'mdi-update',
           captionKey: 'apps.menu.update',
           enabled: () => !this.isActual(),
+          show: () => this.isInstalled()
+        },
+        {
+          action: () => this.repairApp(),
+          icon: 'mdi-progress-wrench',
+          captionKey: 'apps.menu.repair',
           show: () => this.isInstalled()
         },
         {
@@ -181,18 +187,20 @@ export default {
       setAppToInstall: 'download/setAppToInstall',
       setAppToDelete: 'download/setAppToDelete',
     }),
+    ...mapActions({
+      launch: 'app/launchApp'
+    }),
     editApp() {
     },
     launchApp() {
-      if (!this.appConfig || !this.appConfig.get('installedPath')) return ''
-      ipcRenderer.invoke('launch', this.selectedApp, this.appConfig.get('installedPath'))
+      this.launch(this.selectedApp)
     },
     downloadApp() {
       const version = getLatest(this.selectedApp.versions)
       this.setAppToInstall({app: this.selectedApp, version})
     },
     uninstallApp() {
-      if (confirm(`${this.$t('dialog.deleteApp')} "${this.selectedApp.appName}"?`)) {
+      if (confirm(`${this.$t('dialog.deleteApp.confirm')} "${this.selectedApp.appName}"?`)) {
         this.setAppToDelete(this.selectedApp)
       }
     },
@@ -224,6 +232,10 @@ export default {
     canLaunch() {
       if (!this.appConfig || !this.appConfig.get('installed')) return false
       return this.appConfig.get('downloaded')
+    },
+    repairApp() {
+      const version = this.installedVersion()
+      if (version) this.setAppToInstall({app: this.selectedApp, version})
     }
   },
 }

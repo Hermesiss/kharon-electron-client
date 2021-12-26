@@ -24,6 +24,7 @@
       "edit": "Edit",
       "install": "Install",
       "launch": "Launch",
+      "repair": "Repair files",
       "uninstall": "Uninstall",
       "update": "Update"
     },
@@ -60,7 +61,13 @@
     "title": "Debug"
   },
   "dialog": {
-    "deleteApp": "Are you shure you want to delete an app"
+    "deleteApp": {
+      "confirm": "Are you sure you want to delete an app",
+      "error": {
+        "text": "Cannot find file. Please launch \"Repair files\"",
+        "title": "File not found"
+      }
+    }
   },
   "home": {
     "title": "Home"

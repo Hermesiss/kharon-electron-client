@@ -1,6 +1,5 @@
 import ElectronStore from 'electron-store'
 import {ipcRenderer} from 'electron'
-
 /**
  * @typedef {object} KharonVersion
  * @property {string} version
@@ -98,6 +97,20 @@ export const getters = {
 }
 
 export const actions = {
+  /**
+   *
+   * @param context
+   * @param {KharonApp} kharonApp
+   * @return {Promise<void>}
+   */
+  async launchApp(context, kharonApp) {
+    const appConfig = context.state.appConfigs[kharonApp.appCode]
+    if (!appConfig || !appConfig.get('installedPath')) return
+
+    await ipcRenderer.invoke('launch', kharonApp, appConfig.get('installedPath'),
+      this.$i18n.t('dialog.deleteApp.error.title'),
+      this.$i18n.t('dialog.deleteApp.error.text'))
+  },
   /**
    *
    * @param context
