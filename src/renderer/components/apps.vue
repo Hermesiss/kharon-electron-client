@@ -108,12 +108,14 @@
 
 <script>
 import {mapActions, mapGetters, mapMutations, mapState} from 'vuex'
+import {ipcRenderer} from 'electron'
 import {getLatest} from '../plugins/helpers'
 
 export default {
   name: 'Apps',
   data: () => ({
     editDialogue: false,
+    /** @type {AppCreateDTO}     */
     editedApp: {},
     valid: null
   }),
@@ -156,6 +158,10 @@ export default {
       setSelectedApp: 'app/setSelectedApp',
       setAppToInstall: 'download/setAppToInstall'
     }),
+    /**
+     *
+     * @param {KharonApp} app
+     */
     openEditDialogue(app) {
       this.editedApp = {...app}
       this.editDialogue = true
@@ -185,18 +191,40 @@ export default {
 
       return false
     },
+    /**
+     *
+     * @param {KharonApp} app
+     * @return {string|*}
+     */
     getVersion(app) {
       const appConfig = this.getAppConfig(app.appCode)
       if (!appConfig?.get('installed')) return ''
 
       return appConfig?.get('version')
     },
+    /**
+     *
+     * @param {String} appCode
+     * @return {Boolean}
+     */
     appInstalled(appCode) {
       const appConfig = this.getAppConfig(appCode)
       return appConfig?.get('installed')
     },
+    /**
+     *
+     * @param {KharonApp} app
+     */
     launchApp(app) {
+      const appConfig = this.getAppConfig(app.appCode)
+      console.log('APP CONFIG', appConfig)
+      if (!appConfig || !appConfig.get('installedPath')) return ''
+      ipcRenderer.invoke('launch', app, appConfig.get('installedPath'))
     },
+    /**
+     *
+     * @param {KharonApp} app
+     */
     downloadAdd(app) {
       const version = getLatest(app.versions)
       this.setAppToInstall({app, version})

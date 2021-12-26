@@ -52,7 +52,8 @@ export default {
       getAppConfig: 'app/getAppConfig'
     }),
     ...mapState({
-      appToInstall: state => state.download.appToInstall
+      appToInstall: state => state.download.appToInstall,
+      appToDelete: state => state.download.appToDelete,
     }),
     getFileState() {
       return `${humanize.filesize(this.uploadState.bytes)}/${humanize.filesize(this.uploadState.totalBytes)}`
@@ -62,10 +63,22 @@ export default {
     },
   },
   watch: {
+    /**
+     *
+     * @param {AppToInstall} newApp
+     */
     appToInstall(newApp) {
       console.log('NEW APP', newApp)
       this.startDownload(newApp.app, newApp.version)
-    }
+    },
+    /**
+     *
+     * @param {AppToDelete} deletedApp
+     */
+    appToDelete(deletedApp) {
+      console.log('deleteApp', deletedApp)
+      this.startDeleting(deletedApp.app)
+    },
   },
   mounted() {
     ipcRenderer.on('app-download-progress', (_, progress) => {
@@ -77,6 +90,40 @@ export default {
       downloadManifest: 'app/downloadManifest',
       fetchApps: 'app/fetchApps',
     }),
+    /**
+     * @param {KharonApp} app
+     * @return {Promise<void>}
+     */
+    async startDeleting(app) {
+      const appConfig = this.getAppConfig(app.appCode)
+
+      if (!appConfig) {
+        console.error(`AppConfig for ${app} not found`)
+        return
+      }
+
+      /** @type {string}       */
+      const appPath = appConfig.get('installedPath')
+
+      if (!fs.existsSync(appPath)) {
+        console.error(`Cannot uninstall from ${appPath}: Path not found`)
+        return
+      }
+
+      fs.rmdirSync(appPath, {recursive: true})
+
+      appConfig.set('installed', false)
+      appConfig.set('downloaded', false)
+      appConfig.set('version', '0.0.0')
+      console.log('Delete shortcuts')
+      await ipcRenderer.invoke('shortcuts-delete', app, appPath)
+      await this.fetchApps()
+    },
+    /**
+     * @param {KharonApp} app
+     * @param {String} version
+     * @return {Promise<void>}
+     */
     async startDownload(app, version) {
       const appConfig = this.getAppConfig(app.appCode)
 
@@ -89,7 +136,7 @@ export default {
       appConfig.set('installed', true)
       appConfig.set('downloaded', false)
       const appPath = `C:/Temp/${app.appCode}` // TODO get from config or ask
-      appConfig?.set('installedPath', appPath)
+      appConfig.set('installedPath', appPath)
 
       this.uploadState = null
       this.showUploadProcess = true
@@ -102,6 +149,8 @@ export default {
         diff = await ipcRenderer.invoke('manifest-diff', currentManifest, manifest)
       }
       await ipcRenderer.invoke('download-app', manifest, app, appPath, diff)
+      console.log('Create shortcuts')
+      await ipcRenderer.invoke('shortcuts-create', app, appPath)
       this.showUploadProcess = false
       appConfig.set('downloaded', true)
       await this.fetchApps()

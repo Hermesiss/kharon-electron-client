@@ -4,7 +4,7 @@
     <v-list class="overflow-y-auto my-scrollable-list">
       <v-list-item v-for="version in selectedApp.versions" :key="version.version"
                    :class="isVersionInstalled(version.version)? 'installed-version' : ''"
-                   class="pl-2"
+                   class="px-4"
       >
         <v-list-item-title>{{ version.version }}</v-list-item-title>
         <v-list-item-subtitle>{{ getDate(version) }}</v-list-item-subtitle>

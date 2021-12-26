@@ -26,9 +26,9 @@
                 @click="item.action()"
               >
                 <v-list-item-icon>
-                  <v-icon>{{ item.icon }}</v-icon>
+                  <v-icon :color="item.color">{{ item.icon }}</v-icon>
                 </v-list-item-icon>
-                <v-list-item-title>{{ $t(item.captionKey) }}</v-list-item-title>
+                <v-list-item-title :class="item.color + '--text'">{{ $t(item.captionKey) }}</v-list-item-title>
               </v-list-item>
             </v-list>
           </v-menu>
@@ -37,7 +37,7 @@
     </v-card-title>
     <v-card-actions>
       <div v-if="isInstalled()">
-        <v-btn color="success" :disabled="!canLaunch()">
+        <v-btn color="success" :disabled="!canLaunch()" @click="launchApp">
           <v-icon>mdi-play</v-icon>
           {{ $t('apps.menu.launch') }}
         </v-btn>
@@ -83,6 +83,7 @@
 
 <script>
 import {mapGetters, mapMutations, mapState} from 'vuex'
+import {ipcRenderer} from 'electron'
 import {getLatest} from '../../plugins/helpers'
 import Versions from './versions'
 
@@ -91,6 +92,19 @@ export default {
   components: {Versions},
   data() {
     return {
+      /** @typedef {Object} MenuItem
+       * @property {Function} action
+       * @property {String} icon
+       * @property {String} captionKey
+       * @property {string[]} [rolesOnly]
+       * @property {Function} [enabled]
+       * @property {Function} [show]
+       * @property {string} [color]
+       */
+
+      /**
+       * @type {Array<MenuItem>}
+       */
       menuItems: [
         {
           action: () => this.editApp(),
@@ -118,6 +132,14 @@ export default {
           enabled: () => !this.isActual(),
           show: () => this.isInstalled()
         },
+        {
+          action: () => this.uninstallApp(),
+          icon: 'mdi-delete',
+          captionKey: 'apps.menu.uninstall',
+          enabled: () => this.canLaunch(),
+          show: () => this.isInstalled(),
+          color: 'error'
+        },
       ],
       appConfig: null,
       tab: null,
@@ -135,13 +157,15 @@ export default {
       isRoleSatisfies: 'user/isRoleSatisfies',
       getAppConfig: 'app/getAppConfig'
     }),
+    /**
+     *
+     * @return {MenuItem[]}
+     */
     menuItemsFiltered() {
       return this.menuItems.filter(x => {
         if (x.show && !x.show()) return false
         // v-if="!item.show && isRoleSatisfies(item.rolesOnly)"
-        if (!this.isRoleSatisfies(x.rolesOnly)) return false
-
-        return true
+        return this.isRoleSatisfies(x.rolesOnly)
       })
     },
   },
@@ -155,15 +179,23 @@ export default {
   },
   methods: {
     ...mapMutations({
-      setAppToInstall: 'download/setAppToInstall'
+      setAppToInstall: 'download/setAppToInstall',
+      setAppToDelete: 'download/setAppToDelete',
     }),
     editApp() {
     },
     launchApp() {
+      if (!this.appConfig || !this.appConfig.get('installedPath')) return ''
+      ipcRenderer.invoke('launch', this.selectedApp, this.appConfig.get('installedPath'))
     },
     downloadApp() {
       const version = getLatest(this.selectedApp.versions)
       this.setAppToInstall({app: this.selectedApp, version})
+    },
+    uninstallApp() {
+      if (confirm(`${this.$t('dialog.deleteApp')} "${this.selectedApp.appName}"?`)) {
+        this.setAppToDelete(this.selectedApp)
+      }
     },
     installedVersion() {
       if (!this.appConfig || !this.appConfig.get('installed')) return ''

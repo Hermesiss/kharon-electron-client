@@ -1,6 +1,7 @@
 const path = require('path')
+const child_process = require('child_process')
 const fs = require('fs-extra')
-const {app, ipcMain, BrowserWindow, dialog} = require('electron')
+const {app, ipcMain, BrowserWindow, dialog, shell} = require('electron')
 const {download} = require('electron-dl')
 const fetch = require('electron-fetch').default
 const isDev = require('electron-is-dev')
@@ -157,6 +158,58 @@ ipcMain.handle('manifest-generate', async (event, directory, savePath, oldManife
 ipcMain.handle('manifest-diff', async (event, oldManifest, newManifest) => {
   return await diffManifests(oldManifest, newManifest)
 })
+
+ipcMain.handle('launch',
+  /**
+   *
+   * @param event
+   * @param {KharonApp} kharonApp
+   * @param {string} appPath
+   * @return {Promise<void>}
+   */
+  async (event, kharonApp, appPath) => {
+    const exePath = path.join(appPath, kharonApp.exePath)
+    console.log('LAUNCHING', exePath)
+    child_process.execFile(exePath);
+  })
+
+ipcMain.handle('shortcuts-create',
+  /**
+   *
+   * @param event
+   * @param {KharonApp} kharonApp
+   * @param {string} appPath
+   * @return {Promise<void>}
+   */
+  async (event, kharonApp, appPath) => {
+    const shortcut = path.join(app.getPath('home'), 'Desktop', `${kharonApp.appName}.lnk`)
+    const exePath = path.join(appPath, kharonApp.exePath)
+    console.log('CREATING SHORTCUTS', shortcut, exePath)
+    const res = shell.writeShortcutLink(shortcut, {
+      target: exePath,
+      icon: exePath,
+      iconIndex: 0
+    })
+  })
+
+ipcMain.handle('shortcuts-delete',
+  /**
+   *
+   * @param event
+   * @param {KharonApp} kharonApp
+   * @param {string} appPath
+   * @return {Promise<void>}
+   */
+  async (event, kharonApp, appPath) => {
+    const shortcut = path.join(app.getPath('home'), 'Desktop', `${kharonApp.appName}.lnk`)
+    if (!fs.existsSync(shortcut)) {
+      console.log('SHORTCUT', shortcut, 'not exists, cannot delete')
+      return
+    }
+
+    console.log('DELETING SHORTCUTS', shortcut)
+    const res = shell.trashItem(shortcut)
+  })
 
 ipcMain.handle('download-app', async (event, manifest, app, filePath, diff) => {
   const win = BrowserWindow.getFocusedWindow()

@@ -14,7 +14,24 @@ export const state = () => ({
   downloadProgress: 0,
   isFetching: false,
   isDownloading: false,
-  appToInstall: {app: null, version: null}
+  /**
+   *
+   * @typedef {object} AppToInstall
+   * @property {KharonApp | null} app
+   * @property {String | null} version
+   */
+
+  /** @type {AppToInstall}  */
+  appToInstall: {app: null, version: null},
+  /**
+   * @typedef {Object} AppToDelete
+   * @property {KharonApp | null} app
+   */
+
+  /**
+   * @type {AppToDelete} app
+   */
+  appToDelete: {app: null}
 })
 
 export const mutations = {
@@ -46,6 +63,14 @@ export const mutations = {
   },
   setAppToInstall(state, {app, version}) {
     state.appToInstall = {app, version}
+  },
+  /**
+   *
+   * @param state
+   * @param {KharonApp | null} app
+   */
+  setAppToDelete(state, app) {
+    state.appToDelete = {app}
   }
 }
 

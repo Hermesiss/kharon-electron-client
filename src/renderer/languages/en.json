@@ -24,6 +24,7 @@
       "edit": "Edit",
       "install": "Install",
       "launch": "Launch",
+      "uninstall": "Uninstall",
       "update": "Update"
     },
     "title": "Apps",
@@ -57,6 +58,9 @@
   },
   "debug": {
     "title": "Debug"
+  },
+  "dialog": {
+    "deleteApp": "Are you shure you want to delete an app"
   },
   "home": {
     "title": "Home"
