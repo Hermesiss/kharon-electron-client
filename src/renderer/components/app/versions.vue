@@ -12,7 +12,7 @@
           <v-btn v-if="isAdmin" icon @click="deleteSelectedVersion(version)">
             <v-icon>mdi-delete</v-icon>
           </v-btn>
-          <v-btn :disabled="isVersionInstalled(version.version)" icon
+          <v-btn icon
                  @click.prevent.stop="startDownload(version.version)"
           >
             <v-icon>mdi-download</v-icon>

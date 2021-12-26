@@ -136,7 +136,6 @@ export default {
           action: () => this.uninstallApp(),
           icon: 'mdi-delete',
           captionKey: 'apps.menu.uninstall',
-          enabled: () => this.canLaunch(),
           show: () => this.isInstalled(),
           color: 'error'
         },

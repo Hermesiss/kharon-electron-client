@@ -105,12 +105,9 @@ export default {
       /** @type {string}       */
       const appPath = appConfig.get('installedPath')
 
-      if (!fs.existsSync(appPath)) {
-        console.error(`Cannot uninstall from ${appPath}: Path not found`)
-        return
+      if (fs.existsSync(appPath)) {
+        fs.rmdirSync(appPath, {recursive: true})
       }
-
-      fs.rmdirSync(appPath, {recursive: true})
 
       appConfig.set('installed', false)
       appConfig.set('downloaded', false)
@@ -135,7 +132,7 @@ export default {
       appConfig.set('version', version)
       appConfig.set('installed', true)
       appConfig.set('downloaded', false)
-      const appPath = `C:/Temp/${app.appCode}` // TODO get from config or ask
+      const appPath = `C:/InstalledApps/${app.appCode}` // TODO get from config or ask
       appConfig.set('installedPath', appPath)
 
       this.uploadState = null

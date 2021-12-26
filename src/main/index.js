@@ -211,6 +211,11 @@ ipcMain.handle('shortcuts-delete',
     const res = shell.trashItem(shortcut)
   })
 
+ipcMain.handle('debug', async () => {
+  const win = BrowserWindow.getFocusedWindow()
+  win.webContents.openDevTools()
+})
+
 ipcMain.handle('download-app', async (event, manifest, app, filePath, diff) => {
   const win = BrowserWindow.getFocusedWindow()
   const webContents = require('electron').webContents.getFocusedWebContents()
