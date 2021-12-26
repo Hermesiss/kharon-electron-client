@@ -82,6 +82,7 @@ export default {
   name: 'Companies',
   data: () => ({
     editDialogue: false,
+    /** @type {KharonCompany | null} */
     editedCompany: {
       id: '',
       companyName: '',
@@ -109,14 +110,25 @@ export default {
       setSelectedCompany: 'company/selectCompany',
       fetchCompanies: 'company/fetchCompanies'
     }),
-    ...mapMutations({}),
+    ...mapMutations({
+      setSelectedApp: 'app/setSelectedApp'
+    }),
+    /**
+     *
+     * @param {KharonCompany | null} company
+     */
     openEditDialogue(company) {
       this.editedCompany = {...company}
       this.editDialogue = true
     },
+    /**
+     *
+     * @param {KharonCompany} company
+     */
     selectCompany(company) {
       if (company === this.selectedCompany) {
         company = null
+        this.setSelectedApp(null)
       }
 
       this.setSelectedCompany(company)

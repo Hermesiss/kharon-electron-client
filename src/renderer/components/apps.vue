@@ -23,6 +23,9 @@
             <v-list-item-title>{{ app.appName }}</v-list-item-title>
             <v-list-item-subtitle>{{ getVersion(app) }}</v-list-item-subtitle>
           </v-list-item-content>
+          <v-btn v-if="isAdmin" icon @click.prevent.stop="openEditDialogue(app)">
+            <v-icon>mdi-pencil</v-icon>
+          </v-btn>
           <v-list-item-action>
             <v-badge bordered dot :value="updateAvailable(app)" color="accent">
               <v-btn icon @click.prevent.stop="appInstalled(app.appCode) ? launchApp(app) : downloadAdd(app)">
@@ -111,12 +114,13 @@ import {mapActions, mapGetters, mapMutations, mapState} from 'vuex'
 import {ipcRenderer} from 'electron'
 import {getLatest} from '../plugins/helpers'
 
+// noinspection JSCheckFunctionSignatures
 export default {
   name: 'Apps',
   data: () => ({
     editDialogue: false,
-    /** @type {AppCreateDTO}     */
-    editedApp: {},
+    /** @type {AppCreateDTO | AppUpdateDTO | null}     */
+    editedApp: null,
     valid: null
   }),
   computed: {
@@ -131,6 +135,10 @@ export default {
       companies: state => state.company.companies,
       isFetching: state => state.app.isFetching,
     }),
+    /**
+     *
+     * @return {number}
+     */
     selected() {
       return this.apps.indexOf(this.selectedApp)
     },
@@ -161,12 +169,16 @@ export default {
     }),
     /**
      *
-     * @param {KharonApp} app
+     * @param {KharonApp | null} app
      */
     openEditDialogue(app) {
       this.editedApp = {...app}
       this.editDialogue = true
     },
+    /**
+     *
+     * @param {KharonApp | null} app
+     */
     selectApp(app) {
       if (app === this.selectedApp) {
         app = null
@@ -227,6 +239,10 @@ export default {
       const version = getLatest(app.versions)
       this.setAppToInstall({app, version})
     },
+    /**
+     *
+     * @param {KharonApp} app
+     */
     updateAvailable(app) {
       if (!this.appInstalled(app.appCode)) return false
       const current = this.getVersion(app)

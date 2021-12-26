@@ -2,25 +2,25 @@ import ElectronStore from 'electron-store'
 import {ipcRenderer} from 'electron'
 /**
  * @typedef {object} KharonVersion
- * @property {string} version
- * @property {string} date
+ * @property {string} version - semver e.g. "1.0.2"
+ * @property {string} date - e.g. "2021-11-27T13:20:46.201Z"
  * @property {string} _id
  * @property {string} changes
  */
 
 /** @typedef {object} KharonApp
  * @property {boolean} published
- * @property {string} ftpHost
- * @property {string} ftpPath
- * @property {string} exePath
- * @property {string} exeParams
+ * @property {string} ftpHost - ftp domain or ip e.g. "1.1.1.1"
+ * @property {string} ftpPath - path inside ftp e.g. "/www/trismegistus.tech/kharon/apps/"
+ * @property {string} exePath - relative path for exe file e.g. "bin/myapp.exe"
+ * @property {string} exeParams - params passed to exe file
  * @property {Array<string>} ignoredFiles
  * @property {Array<string>} ignoredExtensions
  * @property {string} appCode
  * @property {string} appName
- * @property {string} company
- * @property {string} rootPath
- * @property {string} createdDate
+ * @property {string} company - owner company id
+ * @property {string} rootPath - path for download e.g. "https://trismegistus.tech/kharon/apps"
+ * @property {string} createdDate - e.g. "2021-11-22T08:16:25.289Z"
  * @property {Array<KharonVersion>} versions
  * @property {string} id
  */
@@ -65,7 +65,7 @@ export const mutations = {
   /**
    *
    * @param state
-   * @param {KharonApp} selectedApp
+   * @param {KharonApp | null} selectedApp
    */
   setSelectedApp(state, selectedApp) {
     state.selectedApp = selectedApp
@@ -119,6 +119,7 @@ export const actions = {
    */
   async fetchApps(context, apps) {
     if (!apps) {
+      /** @type {KharonCompany} */
       const c = context.rootGetters['company/getSelectedCompany']
       apps = c?.apps
     }

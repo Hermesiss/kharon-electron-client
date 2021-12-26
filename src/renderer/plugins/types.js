@@ -1,3 +1,7 @@
+/**
+ *
+ * @enum {Number}
+ */
 export const UpdateState = {
   None: 0,
   Actual: 1,

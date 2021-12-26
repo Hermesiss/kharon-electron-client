@@ -1,6 +1,5 @@
 <template>
   <div>
-    Empty here
     <v-btn @click="openDev()">Debug tools</v-btn>
   </div>
 </template>
@@ -13,7 +12,6 @@ export default {
   methods: {
     openDev() {
       ipcRenderer.invoke('debug')
-      // window.openDevTools()
     }
   }
 }

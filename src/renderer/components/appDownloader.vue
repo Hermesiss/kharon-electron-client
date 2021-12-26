@@ -68,6 +68,7 @@ export default {
      * @param {AppToInstall} newApp
      */
     appToInstall(newApp) {
+      if (!newApp || !newApp.app) return
       console.log('NEW APP', newApp)
       this.startDownload(newApp.app, newApp.version)
     },
@@ -76,6 +77,7 @@ export default {
      * @param {AppToDelete} deletedApp
      */
     appToDelete(deletedApp) {
+      if (!deletedApp || !deletedApp.app) return
       console.log('deleteApp', deletedApp)
       this.startDeleting(deletedApp.app)
     },

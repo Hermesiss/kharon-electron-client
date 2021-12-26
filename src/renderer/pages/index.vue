@@ -1,6 +1,4 @@
 <template>
-  <!--    <h1>{{ $t('common.helloWorld') }}</h1>
-  <NuxtLink to="login">LOGIN</NuxtLink>-->
   <v-container fluid fill-height class="pa-0">
     <v-row class="fill-height" no-gutters>
       <v-col v-if="isAdmin" cols="auto" class="fill-height py-0">
@@ -44,6 +42,10 @@ export default {
     ...mapActions({
       fetchCompanies: 'company/fetchCompanies'
     }),
+    /**
+     *
+     * @param {String} url
+     */
     openURL(url) {
       remote.shell.openExternal(url)
     }

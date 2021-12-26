@@ -106,12 +106,12 @@ export default {
        * @type {Array<MenuItem>}
        */
       menuItems: [
-        {
+        /* {
           action: () => this.editApp(),
           icon: 'mdi-pencil',
           captionKey: 'apps.menu.edit',
           rolesOnly: ['admin']
-        },
+        }, */
         {
           action: () => this.launchApp(),
           icon: 'mdi-play',

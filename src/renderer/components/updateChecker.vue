@@ -54,22 +54,6 @@ export default {
         default:
           return ''
       }
-
-      /* switch (this.currentUpdateState) {
-        case UpdateState.CanInstall:
-          break;
-        case UpdateState.Actual:
-          break;
-        case UpdateState.Fetching:
-          break;
-        case UpdateState.NewAvailable:
-          break;
-        case UpdateState.Downloading:
-          break;
-        default:
-          break;
-
-      } */
     },
     getButtonTitle() {
       switch (this.currentUpdateState) {
@@ -86,13 +70,6 @@ export default {
         default:
           return ''
       }
-
-      /* if (this.isDownloading) return 'Downloading...'
-      if (this.isPending) return 'Restart and update'
-      if (!this.isActual) {
-        return `Download ${humanize.filesize(this.$store.state.download.downloadSize)}`
-      }
-      return 'Check for update' */
     },
     getButtonSubtitle() {
       switch (this.currentUpdateState) {
