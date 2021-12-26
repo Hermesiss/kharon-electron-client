@@ -1,10 +1,11 @@
+const path = require('path')
 const ICONS_DIR = 'build/icons/'
 
 require('dotenv').config()
 
 const windowsOS = {
   win: {
-    icon: ICONS_DIR + 'win-icon.ico',
+    icon: path.join(ICONS_DIR, 'win', 'icon.ico'),
     publisherName: 'hermesis',
     target: 'nsis',
     requestedExecutionLevel: 'highestAvailable',
@@ -30,7 +31,7 @@ const windowsOS = {
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const linuxOS = {
   linux: {
-    icon: ICONS_DIR,
+    icon: path.join(ICONS_DIR, 'png/'),
     target: 'deb'
   }
 }
@@ -39,7 +40,7 @@ const linuxOS = {
 const macOS = {
   mac: {
     target: 'dmg',
-    icon: ICONS_DIR + 'con.icns'
+    icon: path.join(ICONS_DIR, 'mac', 'icon.icns'),
   },
   dmg: {
     contents: [
