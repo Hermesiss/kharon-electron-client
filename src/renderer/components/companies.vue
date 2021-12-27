@@ -123,7 +123,7 @@ export default {
     },
     /**
      *
-     * @param {KharonCompany} company
+     * @param {KharonCompany | null} company
      */
     selectCompany(company) {
       if (company === this.selectedCompany) {

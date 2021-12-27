@@ -27,23 +27,21 @@
             </v-btn>
           </v-list-item-action>
         </v-list-item>
-        <drawer-list-item v-for="page in pages"
+        <drawer-list-item v-for="page in getPages"
                           :key="page.path"
                           :caption="page.captionKey"
                           :icon="page.icon"
                           :path="page.path"
-                          :v-if="isRoleSatisfies(page.rolesOnly)"
         />
       </v-list>
     </v-layout>
     <template #append>
       <v-list>
-        <drawer-list-item v-for="page in bottomPages"
+        <drawer-list-item v-for="page in getBottomPages"
                           :key="page.path"
                           :caption="page.captionKey"
                           :icon="page.icon"
                           :path="page.path"
-                          :v-if="isRoleSatisfies(page.rolesOnly)"
         />
 
         <drawer-list-item caption="settings.title" icon="mdi-cog"
@@ -82,6 +80,12 @@ export default {
       isActual: 'download/isActual',
       isRoleSatisfies: 'user/isRoleSatisfies'
     }),
+    getPages() {
+      return this.pages.filter(x => this.isRoleSatisfies(x.rolesOnly))
+    },
+    getBottomPages() {
+      return this.bottomPages.filter(x => this.isRoleSatisfies(x.rolesOnly))
+    },
     isLogged() {
       return this.$auth.loggedIn
     },

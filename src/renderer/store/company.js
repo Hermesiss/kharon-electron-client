@@ -47,13 +47,13 @@ export const mutations = {
 }
 
 export const getters = {
+  getAll: state => state.companies,
   /**
    *
    * @param state
    * @return {function(String): KharonCompany | undefined}
    */
   getCompanyById: state => id => {
-    console.log('GET COMPANY BY ID', id)
     return state.companies.find(c => c.id === id)
   },
   /**
@@ -69,6 +69,14 @@ export const getters = {
     const currentUser = rootGetters['user/currentUser']
     return isAdmin ? state.selectedCompany : getters.getCompanyById(currentUser?.company)
   },
+  /**
+   *
+   * @param state
+   * @return {Array<String>}
+   */
+  getAllApps: state => {
+    return [].concat.apply([], state.companies.map(x => x.apps))
+  }
 }
 
 export const actions = {

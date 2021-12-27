@@ -100,6 +100,13 @@
     }
   },
   "users": {
+    "editor": {
+      "apps": "Apps",
+      "firstName": "First name",
+      "password": "New password",
+      "passwordHint": "Leave blanc to not change",
+      "username": "Username"
+    },
     "title": "Users"
   }
 }

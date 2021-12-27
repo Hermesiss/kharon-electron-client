@@ -15,7 +15,7 @@
         :value="selected"
         color="primary"
       >
-        <v-list-item v-for="app in apps"
+        <v-list-item v-for="app in filteredApps"
                      :key="app.id" two-line
                      @click.stop.prevent="selectApp(app)"
         >
@@ -44,7 +44,7 @@
         v-model="editDialogue"
         width="500"
       >
-        <v-card>
+        <v-card v-if="editedApp">
           <v-form ref="form"
                   v-model="valid"
           >
@@ -127,7 +127,8 @@ export default {
     ...mapGetters({
       userRole: 'user/currentUserRole',
       isAdmin: 'user/isAdmin',
-      getAppConfig: 'app/getAppConfig'
+      getAppConfig: 'app/getAppConfig',
+      currentUser: 'user/currentUser'
     }),
     ...mapState({
       apps: state => state.app.apps,
@@ -135,6 +136,16 @@ export default {
       companies: state => state.company.companies,
       isFetching: state => state.app.isFetching,
     }),
+    /**
+     *
+     * @return {Array<KharonApp>}
+     */
+    filteredApps() {
+      if (this.currentUser.role === 'user') {
+        return this.apps.filter(x => this.currentUser.apps.includes(x.appCode))
+      }
+      return this.apps
+    },
     /**
      *
      * @return {number}

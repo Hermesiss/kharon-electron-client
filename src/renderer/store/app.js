@@ -121,10 +121,16 @@ export const actions = {
     if (!apps) {
       /** @type {KharonCompany} */
       const c = context.rootGetters['company/getSelectedCompany']
-      apps = c?.apps
+      if (!c) {
+        return
+      } else {
+        apps = c.apps
+      }
     }
     context.commit('setFetching', true)
     context.commit('setLastAppCount', apps.length)
+
+    console.log('fetching apps', apps)
 
     const selected = context.state.selectedApp?.id
 
@@ -174,13 +180,6 @@ export const actions = {
     const resp = await this.$axios.$post('/apps/create', app)
     return resp.data
   },
-  /* {
-        "appName": String,
-        "appCode": String,
-        "rootPath": URL,
-        "company" : String
-        "id": String
-  } */
 
   /**
    *

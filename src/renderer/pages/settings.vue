@@ -93,10 +93,18 @@ export default {
     },
   },
   methods: {
-    ...mapMutations({setFtpPwd: 'settings/setFtpPassword'}),
+    ...mapMutations({
+      setFtpPwd: 'settings/setFtpPassword',
+      setApps: 'app/setApps',
+      setCompanies: 'company/setCompanies',
+      setUsers: 'user/setUsers'
+    }),
     async logout() {
       try {
         await this.$auth.logout('local')
+        this.setCompanies([])
+        this.setApps([])
+        this.setUsers([])
       } catch (err) {
         console.error(err)
       }
