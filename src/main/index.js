@@ -8,6 +8,18 @@ const isDev = require('electron-is-dev')
 const ftp = require('basic-ftp')
 const {checkForUpdatesSelf, downloadSelf, installSelf} = require('./update/selfUpdater')
 
+/**
+ *
+ * @param channel
+ * @param args
+ */
+function sendToRenderer(channel, ...args) {
+  const win = BrowserWindow.getAllWindows()[0]
+  if (!win) return
+
+  win.webContents.send(channel, ...args)
+}
+
 // Quit when all windows are closed.
 app.on('window-all-closed', function () {
   // On macOS it is common for applications and their menu bar
@@ -23,13 +35,12 @@ app.on('browser-window-created', (event, win) => {
 require('./mainWindow')
 
 ipcMain.handle('get-folder', async () => {
-  const result = await dialog.showOpenDialog({properties: ['openDirectory']})
-  return result
+  return await dialog.showOpenDialog({properties: ['openDirectory']})
 })
 
 ipcMain.handle('upload-ftp', async (event, params) => {
   console.log('starting ftp with params', params)
-  const webContents = require('electron').webContents.getFocusedWebContents()
+
   const appCode = params.appCode
   const version = params.version
   const ftpPath = params.ftpPath
@@ -71,7 +82,7 @@ ipcMain.handle('upload-ftp', async (event, params) => {
       await client.uploadFrom(from, to)
       console.log(`UPDATED ${i + 1} from ${manifestLength}`)
       uploadedBytes += manifestElement.fileSize
-      webContents.send('ftp-uploaded', {
+      sendToRenderer('ftp-uploaded', {
         count: i + 1,
         totalCount: manifestLength,
         bytes: uploadedBytes,
@@ -84,7 +95,7 @@ ipcMain.handle('upload-ftp', async (event, params) => {
 
     isSuccess = true
   } catch (err) {
-    console.log(err)
+    console.log('UPLOAD ERROR', err)
   }
   client.close()
   return isSuccess
@@ -98,13 +109,12 @@ ipcMain.handle('check-update', async () => {
 })
 
 ipcMain.handle('download-update', async () => {
-  const webContents = require('electron').webContents.getFocusedWebContents()
   return await downloadSelf(
-    progress => webContents.send('downloadProgress', progress),
-    () => webContents.send('downloadState', true),
+    progress => sendToRenderer('downloadProgress', progress),
+    () => sendToRenderer('downloadState', true),
     () => {
-      webContents.send('downloadState', false)
-      webContents.send('canUpdate')
+      sendToRenderer('downloadState', false)
+      sendToRenderer('canUpdate')
     },
   )
 })
@@ -222,8 +232,7 @@ ipcMain.handle('debug', async () => {
 })
 
 ipcMain.handle('download-app', async (event, manifest, app, filePath, diff) => {
-  const win = BrowserWindow.getFocusedWindow()
-  const webContents = require('electron').webContents.getFocusedWebContents()
+  const win = BrowserWindow.getAllWindows()[0]
 
   console.log(manifest)
 
@@ -278,7 +287,7 @@ ipcMain.handle('download-app', async (event, manifest, app, filePath, diff) => {
         currentProgress.totalCount = filesForDownload.length
         currentProgress.currentFileSize = manifestElement.fileSize
         currentProgress.currentFilePath = manifestElement.filePath
-        webContents.send('app-download-progress', currentProgress)
+        sendToRenderer('app-download-progress', currentProgress)
       },
     })
     downloaded += manifestElement.fileSize

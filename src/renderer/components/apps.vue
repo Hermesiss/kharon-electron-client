@@ -97,7 +97,7 @@
               <v-btn
                 color="success"
                 :disabled="!valid"
-                @click="editDialogue = false; saveApp()"
+                @click="saveApp()"
               >
                 {{ $t('common.save') }}
               </v-btn>
@@ -198,13 +198,17 @@ export default {
       this.setSelectedApp(app)
     },
     async saveApp() {
-      if (this.editedApp.id) {
-        await this.updateApp(this.editedApp)
-      } else {
-        await this.createApp(this.editedApp)
+      try {
+        if (this.editedApp.id) {
+          await this.updateApp(this.editedApp)
+        } else {
+          await this.createApp(this.editedApp)
+        }
+        this.editDialogue = false
+        await this.fetchCompanies()
+      } catch (e) {
+        alert(e)
       }
-
-      await this.fetchCompanies()
     },
     deleteAppPrompt() {
       if (confirm(`Are you sure you want to delete app "${this.editedApp.appName}"?`)) {

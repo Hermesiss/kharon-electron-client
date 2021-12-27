@@ -236,12 +236,12 @@ export default {
       this.setApp({appCode, app})
     },
     async startUploading() {
-      console.log('WAITING FOR MANIFEST')
       this.uploadState = null
       this.showUploadProcess = true
 
       let latestManifest = null
       const latest = getLatest(this.selectedApp.versions)
+      console.log('WAITING FOR MANIFEST', latest)
       if (latest) {
         latestManifest = await this.downloadManifest({app: this.selectedApp, versionCode: latest})
       }
