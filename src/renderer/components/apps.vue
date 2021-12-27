@@ -142,7 +142,7 @@ export default {
      */
     filteredApps() {
       if (this.currentUser.role === 'user') {
-        return this.apps.filter(x => this.currentUser.apps.includes(x.appCode))
+        return this.apps.filter(x => this.currentUser.apps.includes(x.id))
       }
       return this.apps
     },
