@@ -33,7 +33,9 @@
               {{ item.company ? getCompanyById(item.company).companyName : '' }}
             </template>
             <template #item.apps="{item}">
-              <v-chip v-for="(app, index) in getApps(item)" :key="index">{{ getAppById(app).appCode }}</v-chip>
+              <v-chip v-for="(app, index) in getApps(item)" :key="index">
+                {{ getAppById(app) ? getAppById(app).appCode : '' }}
+              </v-chip>
             </template>
             <template #item.actions="{ item }">
               <v-icon

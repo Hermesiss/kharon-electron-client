@@ -69,6 +69,27 @@
       }
     }
   },
+  "error": {
+    "type": {
+      "app_code_exists": "App code already exists",
+      "app_not_found": "App not found",
+      "auth_invalid_token": "Invalid token",
+      "auth_wrong_credentials": "Wrong login or password",
+      "company_not_found": "Company not found",
+      "company_prefix_exists": "Company prefix already exists",
+      "company_username_mismatch": "User company doesn't correspond to username",
+      "custom": "Unknown error",
+      "mongoose_validation": "Database validation error",
+      "semver_invalid": "Wrong version code",
+      "user_admin_owned_company": "Admins and owners cannot change their company",
+      "user_admin_owned_username": "Admins and owners cannot change their username",
+      "user_not_found": "User not found",
+      "user_username_exists": "Username already exists",
+      "user_username_wrong_format": "Wrong username, must be [company-prefix@username]",
+      "version_exists": "Version already exists",
+      "version_not_found": "Version not found"
+    }
+  },
   "home": {
     "title": "Home"
   },

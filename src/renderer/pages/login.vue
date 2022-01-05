@@ -29,7 +29,10 @@
 </template>
 
 <script>
+import {mapMutations} from 'vuex'
+
 export default {
+  name: 'Login',
   auth: false,
   data() {
     return {
@@ -40,12 +43,21 @@ export default {
     }
   },
   methods: {
+    ...mapMutations({
+      startProgress: 'overlay/startProgress',
+      stopProgress: 'overlay/stopProgress',
+      showError: 'notifications/showError'
+    }),
     async userLogin() {
       try {
-        await this.$auth.loginWith('local', {data: this.login})
+        this.startProgress()
+        const result = await this.$auth.loginWith('local', {data: this.login})
+        console.log('RESULT:', result)
         await this.$router.push('/')
       } catch (err) {
-        console.error(err)
+
+      } finally {
+        this.stopProgress()
       }
     }
   }

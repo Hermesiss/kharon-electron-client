@@ -37,8 +37,13 @@ module.exports = {
   },
   loading: false,
   plugins: [
-    {ssr: true, src: '@/plugins/icons.js'}
+    {ssr: true, src: '@/plugins/icons.js'},
+    '@/plugins/axios'
   ],
+  build: {
+    standalone: true,
+    transpile: []
+  },
   buildModules: [
     '@nuxt/typescript-build',
   ],

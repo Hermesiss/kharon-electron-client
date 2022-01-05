@@ -7,6 +7,8 @@
       <drawer/>
       <nuxt/>
       <app-downloader/>
+      <loading-overlay/>
+      <notifications/>
     </v-main>
   </v-app>
 </template>
@@ -16,9 +18,11 @@
 import {mapActions} from 'vuex'
 import Drawer from '~/components/drawer/drawer'
 import AppDownloader from '~/components/appDownloader'
+import LoadingOverlay from '~/components/loading-overlay'
+import Notifications from '~/components/notifications'
 
 export default {
-  components: {AppDownloader, Drawer},
+  components: {Notifications, LoadingOverlay, AppDownloader, Drawer},
   data() {
     return {}
   },

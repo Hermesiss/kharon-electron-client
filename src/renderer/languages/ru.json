@@ -69,6 +69,27 @@
       }
     }
   },
+  "error": {
+    "type": {
+      "app_code_exists": "Приложение уже существует",
+      "app_not_found": "Приложение не найдено",
+      "auth_invalid_token": "Неверный токен",
+      "auth_wrong_credentials": "Неверный логин или пароль",
+      "company_not_found": "Компания не найдена",
+      "company_prefix_exists": "Префикс компании уже существует",
+      "company_username_mismatch": "Компания не соответствует имени пользователя",
+      "custom": "Неизвестная ошибка",
+      "mongoose_validation": "Ошибка валидации базы данных",
+      "semver_invalid": "Неверный код версии",
+      "user_admin_owned_company": "Админ и владелец не могут менять свою компанию",
+      "user_admin_owned_username": "Админ и владелец не могут менять свой ник",
+      "user_not_found": "Пользователь не найден",
+      "user_username_exists": "Имя пользователя занято",
+      "user_username_wrong_format": "Неверное имя пользователя, должно быть [company-prefix@username]",
+      "version_exists": "Версия уже существует",
+      "version_not_found": "Версия не найдена"
+    }
+  },
   "home": {
     "title": "Главная"
   },
