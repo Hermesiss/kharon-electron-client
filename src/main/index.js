@@ -52,7 +52,7 @@ ipcMain.handle('upload-ftp', async (event, params) => {
   let isSuccess = false
 
   try {
-    const result = await client.access({
+    await client.access({
       host: params.host,
       user: params.user,
       password: params.password,
@@ -60,7 +60,7 @@ ipcMain.handle('upload-ftp', async (event, params) => {
     })
     console.log(await client.list(ftpPath))
     console.log('FTP PATH', ftpPath)
-    const remoteDirPath = [ftpPath, appCode, version.toString()].join('/')
+    const remoteDirPath = '/' + [ftpPath, appCode, version.toString()].join('/')
     console.log('REMOTE PATH', remoteDirPath)
     await client.ensureDir(remoteDirPath)
     await client.clearWorkingDir()
@@ -75,29 +75,37 @@ ipcMain.handle('upload-ftp', async (event, params) => {
     for (let i = 0; i < manifestLength; i++) {
       const manifestElement = actualFiles[i]
       const from = path.join(selectedPath, manifestElement.filePath)
-      const to = [remoteDirPath, manifestElement.filePath].join('/').replaceAll('\\', '/')
+      const to = [remoteDirPath, manifestElement.filePath].join('/').replace(/\\/g, '/')
       const toDir = path.dirname(to)
       console.log(manifestElement, from, to, toDir)
-      await client.ensureDir(toDir)
-      await client.uploadFrom(from, to)
-      console.log(`UPDATED ${i + 1} from ${manifestLength}`)
-      uploadedBytes += manifestElement.fileSize
-      sendToRenderer('ftp-uploaded', {
-        count: i + 1,
-        totalCount: manifestLength,
-        bytes: uploadedBytes,
-        totalBytes,
-        percent: uploadedBytes / totalBytes * 100,
-        currentFilePath: manifestElement.filePath,
-        currentFileSize: manifestElement.fileSize
-      })
+
+      try {
+        await client.ensureDir(toDir)
+        await client.uploadFrom(from, to)
+        console.log(`UPDATED ${i + 1} from ${manifestLength}`)
+        uploadedBytes += manifestElement.fileSize
+        sendToRenderer('ftp-uploaded', {
+          count: i + 1,
+          totalCount: manifestLength,
+          bytes: uploadedBytes,
+          totalBytes,
+          percent: (uploadedBytes / totalBytes) * 100,
+          currentFilePath: manifestElement.filePath,
+          currentFileSize: manifestElement.fileSize
+        })
+      } catch (uploadError) {
+        console.error(`Failed to upload ${from} to ${to}`, uploadError)
+        throw uploadError
+      }
     }
 
     isSuccess = true
   } catch (err) {
     console.log('UPLOAD ERROR', err)
+  } finally {
+    client.close()
   }
-  client.close()
+
   return isSuccess
 })
 
