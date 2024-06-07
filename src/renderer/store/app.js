@@ -12,6 +12,7 @@ import {ipcRenderer} from 'electron'
  * @property {boolean} published
  * @property {string} ftpHost - ftp domain or ip e.g. "1.1.1.1"
  * @property {string} ftpPath - path inside ftp e.g. "/www/trismegistus.tech/kharon/apps/"
+ * @property {string} rootPath - path for download e.g. "https://trismegistus.tech/kharon/apps"
  * @property {string} exePath - relative path for exe file e.g. "bin/myapp.exe"
  * @property {string} exeParams - params passed to exe file
  * @property {Array<string>} ignoredFiles
@@ -19,7 +20,6 @@ import {ipcRenderer} from 'electron'
  * @property {string} appCode
  * @property {string} appName
  * @property {string} company - owner company id
- * @property {string} rootPath - path for download e.g. "https://trismegistus.tech/kharon/apps"
  * @property {string} createdDate - e.g. "2021-11-22T08:16:25.289Z"
  * @property {Array<KharonVersion>} versions
  * @property {string} id
@@ -167,6 +167,8 @@ export const actions = {
    * @property {string} appName
    * @property {string} appCode
    * @property {string} rootPath
+   * @property {string} ftpHost
+   * @property {string} ftpPath
    * @property {string} company
    */
 
@@ -187,6 +189,8 @@ export const actions = {
    * @property {string} appName
    * @property {string} appCode
    * @property {string} rootPath
+   * @property {string} ftpHost
+   * @property {string} ftpPath
    * @property {string} company
    * @property {string} id
    */

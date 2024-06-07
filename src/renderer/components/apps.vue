@@ -55,28 +55,40 @@
             <v-card-text>
               <v-text-field v-model="editedApp.appName" :label="$t('apps.editor.appName')"
                             required :rules="rules.required"
+                            placeholder="My App"
               />
               <v-text-field v-model="editedApp.appCode" :label="$t('apps.editor.appCode')"
                             required :rules="rules.required"
-              />
-              <v-text-field v-model="editedApp.rootPath" :label="$t('apps.editor.rootPath')"
-                            required :rules="rules.required"
+                            placeholder="my-app-code"
               />
               <v-select v-model="editedApp.company" :items="companies" item-text="companyName" item-value="id"
                         :label="$t('company.company')"
                         required :rules="rules.required"
               />
-              <h3>Deploy</h3>
+              <h3>Deploy
+                <v-btn x-small @click="showDialog = true">From hostings</v-btn>
+              </h3>
+              <HostingsOverlay :show-dialog.sync="showDialog" @select="selectHosting"/>
+              <v-text-field v-model="editedApp.rootPath" :label="$t('apps.editor.rootPath')"
+                            required :rules="rules.required"
+                            placeholder="https://example.com/apps"
+              />
               <v-text-field v-model="editedApp.ftpHost" :label="$t('apps.editor.ftpHost')"
                             required :rules="rules.required"
+                            placeholder="1.1.1.1"
               />
               <v-text-field v-model="editedApp.ftpPath" :label="$t('apps.editor.ftpPath')"
                             required :rules="rules.required"
+                            placeholder="apps"
               />
+              <h3>Launch</h3>
               <v-text-field v-model="editedApp.exePath" :label="$t('apps.editor.exePath')"
                             required :rules="rules.required"
+                            placeholder="/bin/app.exe"
               />
-              <v-text-field v-model="editedApp.exeParams" :label="$t('apps.editor.exeParams')"/>
+              <v-text-field v-model="editedApp.exeParams" :label="$t('apps.editor.exeParams')"
+                            placeholder="-p 8080"
+              />
             </v-card-text>
 
             <v-divider/>
@@ -113,15 +125,18 @@
 import {mapActions, mapGetters, mapMutations, mapState} from 'vuex'
 import {ipcRenderer} from 'electron'
 import {getLatest} from '../plugins/helpers'
+import HostingsOverlay from '~/components/hostingsOverlay.vue'
 
 // noinspection JSCheckFunctionSignatures
 export default {
   name: 'Apps',
+  components: {HostingsOverlay},
   data: () => ({
     editDialogue: false,
     /** @type {AppCreateDTO | AppUpdateDTO | null}     */
     editedApp: null,
-    valid: null
+    valid: null,
+    showDialog: false,
   }),
   computed: {
     ...mapGetters({
@@ -178,6 +193,16 @@ export default {
       setSelectedApp: 'app/setSelectedApp',
       setAppToInstall: 'download/setAppToInstall'
     }),
+    /**
+     *
+     * @param {KharonHosting} hosting
+     */
+    selectHosting(hosting) {
+      console.log('selectHosting', hosting)
+      this.editedApp.rootPath = hosting.rootPath
+      this.editedApp.ftpHost = hosting.ftpHost
+      this.editedApp.ftpPath = hosting.ftpPath
+    },
     /**
      *
      * @param {KharonApp | null} app
@@ -252,7 +277,10 @@ export default {
      */
     downloadAdd(app) {
       const version = getLatest(app.versions)
-      this.setAppToInstall({app, version})
+      this.setAppToInstall({
+        app,
+        version
+      })
     },
     /**
      *
