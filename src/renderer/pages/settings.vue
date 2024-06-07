@@ -11,6 +11,9 @@
           <v-card-title>{{ $t('settings.title') }}</v-card-title>
           <v-card-text>
             <v-list>
+              <v-text-field v-model="computerName" :label="$t('settings.computerName')"
+                            type="text"
+              />
               <v-select v-model="currentLocale" :label="$t('settings.language')"
                         :items="availableLocales" item-text="name" item-value="code"
               />
@@ -67,7 +70,8 @@ export default {
   },
   computed: {
     ...mapState({
-      ftpPwd: state => state.settings.ftpPwd
+      ftpPwd: state => state.settings.ftpPwd,
+      compName: state => state.settings.computerName
     }),
     ...mapGetters({
       isAdmin: 'user/isAdmin'
@@ -78,6 +82,14 @@ export default {
       },
       set(newPwd) {
         this.setFtpPwd(newPwd)
+      }
+    },
+    computerName: {
+      get() {
+        return this.compName
+      },
+      set(newName) {
+        this.setComputerName(newName)
       }
     },
     availableLocales() {
@@ -95,6 +107,7 @@ export default {
   methods: {
     ...mapMutations({
       setFtpPwd: 'settings/setFtpPassword',
+      setComputerName: 'settings/setComputerName',
       setApps: 'app/setApps',
       setCompanies: 'company/setCompanies',
       setUsers: 'user/setUsers'

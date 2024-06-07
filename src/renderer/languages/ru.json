@@ -104,7 +104,8 @@
     "language": "Язык",
     "logout": "Выйти из аккаунта",
     "management": "Управление",
-    "title": "Настройки"
+    "title": "Настройки",
+    "computerName": "Имя компьютера"
   },
   "updater": {
     "subtitle": {

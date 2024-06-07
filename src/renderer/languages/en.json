@@ -104,7 +104,8 @@
     "language": "Language",
     "logout": "Log out",
     "management": "Management",
-    "title": "Settings"
+    "title": "Settings",
+    "computerName": "Computer name"
   },
   "updater": {
     "subtitle": {

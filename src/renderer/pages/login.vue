@@ -20,6 +20,11 @@
             :label="$t('login.password')"
             type="password"
           />
+          <v-text-field
+            v-model="computerName"
+            :label="$t('settings.computerName')"
+            type="text"
+          />
 
           <v-btn type="submit">{{ $t('common.submit') }}</v-btn>
         </v-form>
@@ -38,21 +43,24 @@ export default {
     return {
       login: {
         username: '',
-        password: ''
-      }
+        password: '',
+      },
+      computerName: ''
     }
   },
   methods: {
     ...mapMutations({
       startProgress: 'overlay/startProgress',
       stopProgress: 'overlay/stopProgress',
-      showError: 'notifications/showError'
+      showError: 'notifications/showError',
+      setComputerName: 'settings/setComputerName',
     }),
     async userLogin() {
       try {
         this.startProgress()
         const result = await this.$auth.loginWith('local', {data: this.login})
         console.log('RESULT:', result)
+        this.setComputerName(this.computerName)
         await this.$router.push('/')
       } catch (err) {
 
