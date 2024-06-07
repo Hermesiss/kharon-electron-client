@@ -2,6 +2,8 @@ export const state = () => ({
   /** @type {Array<KharonUser>} */
   users: []
 })
+
+const endpoint = '/api/users'
 /**
  * @typedef {('user'|'owner'|'admin')} Role
  */
@@ -87,13 +89,13 @@ export const mutations = {
 
 export const actions = {
   async fetchUsers(state) {
-    const resp = await this.$axios.$get('users/')
+    const resp = await this.$axios.$get(endpoint)
     console.log('USERS', resp)
     state.commit('setUsers', resp)
     return resp
   },
   async fetchMyCompanyUsers(state) {
-    const resp = await this.$axios.$get('users/myCompany')
+    const resp = await this.$axios.$get(`${endpoint}/myCompany`)
     console.log('MY USERS', resp)
     state.commit('setUsers', resp)
     return resp
@@ -116,7 +118,7 @@ export const actions = {
    * @return {Promise<void>}
    */
   async createUser(state, user) {
-    const resp = await this.$axios.$post('users/create', user)
+    const resp = await this.$axios.$post(`${endpoint}/create`, user)
     return resp.data
   },
 
@@ -134,7 +136,7 @@ export const actions = {
    * @return {Promise<void>}
    */
   async updateUser(state, user) {
-    const resp = await this.$axios.$put(`users/${user.id}`, user)
+    const resp = await this.$axios.$put(`${endpoint}/${user.id}`, user)
     return resp.data
   },
 
@@ -145,7 +147,7 @@ export const actions = {
    * @return {Promise<*>}
    */
   async deleteUser(state, userId) {
-    const resp = await this.$axios.$delete(`users/${userId}`)
+    const resp = await this.$axios.$delete(`${endpoint}/${userId}`)
     return resp.data
   }
 }

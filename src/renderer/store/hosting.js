@@ -1,4 +1,4 @@
-import ElectronStore from 'electron-store'
+const endpoint = '/api/hostings'
 
 /** @typedef {object} KharonHosting
  * @property {string} id
@@ -71,10 +71,10 @@ export const actions = {
     state.commit('setFetching', true)
     let hostings = []
     if (!hostingIds) {
-      hostings = await this.$axios.$get('/hostings/')
+      hostings = await this.$axios.$get(endpoint)
     } else {
       for (const id of hostingIds) {
-        const hosting = await this.$axios.$get(`/hostings/${id}`)
+        const hosting = await this.$axios.$get(`${endpoint}/${id}`)
         hostings.push(hosting)
       }
     }
@@ -88,7 +88,7 @@ export const actions = {
    * @return {Promise<*>}
    */
   async createHosting(state, hosting) {
-    const resp = await this.$axios.$post('/hostings/create', hosting)
+    const resp = await this.$axios.$post(`${endpoint}/create`, hosting)
     state.commit('addHosting', resp)
     console.log('created hosting', resp)
     return resp
@@ -100,7 +100,7 @@ export const actions = {
    * @return {Promise<void>}
    */
   async updateHosting(state, hosting) {
-    await this.$axios.$put(`/hostings/${hosting.id}`, hosting)
+    await this.$axios.$put(`${endpoint}/${hosting.id}`, hosting)
   },
   /**
    *
@@ -109,6 +109,6 @@ export const actions = {
    * @return {Promise<void>}
    */
   async deleteHosting(state, hostingId) {
-    await this.$axios.$delete(`/hostings/${hostingId}`)
+    await this.$axios.$delete(`${endpoint}/${hostingId}`)
   }
 }

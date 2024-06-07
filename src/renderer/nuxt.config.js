@@ -22,9 +22,9 @@ module.exports = {
           autoFetch: true
         },
         endpoints: {
-          login: {url: 'users/authenticate', method: 'post'},
+          login: {url: '/api/users/authenticate', method: 'post'},
           logout: false,
-          user: {url: 'users/current', method: 'get'},
+          user: {url: '/api/users/current', method: 'get'},
         }
       },
     }

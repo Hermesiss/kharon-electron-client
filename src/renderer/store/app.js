@@ -1,5 +1,6 @@
 import ElectronStore from 'electron-store'
 import {ipcRenderer} from 'electron'
+
 /**
  * @typedef {object} KharonVersion
  * @property {string} version - semver e.g. "1.0.2"
@@ -7,6 +8,8 @@ import {ipcRenderer} from 'electron'
  * @property {string} _id
  * @property {string} changes
  */
+
+const endpoint = '/api/apps'
 
 /** @typedef {object} KharonApp
  * @property {boolean} published
@@ -26,19 +29,40 @@ import {ipcRenderer} from 'electron'
  */
 
 const mainStoreSchema = {
-  apps: {type: 'array', default: []}
+  apps: {
+    type: 'array',
+    default: []
+  }
 }
 
 const appConfigSchema = {
-  installed: {type: 'boolean', default: false},
-  downloaded: {type: 'boolean', default: false},
-  version: {type: 'string', default: '0.0.0'},
-  installedPath: {type: 'string', default: ''},
-  settings: {type: 'array', default: []}
+  installed: {
+    type: 'boolean',
+    default: false
+  },
+  downloaded: {
+    type: 'boolean',
+    default: false
+  },
+  version: {
+    type: 'string',
+    default: '0.0.0'
+  },
+  installedPath: {
+    type: 'string',
+    default: ''
+  },
+  settings: {
+    type: 'array',
+    default: []
+  }
 }
 
 // noinspection JSCheckFunctionSignatures
-const mainStore = new ElectronStore({name: 'config-apps', schema: mainStoreSchema})
+const mainStore = new ElectronStore({
+  name: 'config-apps',
+  schema: mainStoreSchema
+})
 
 export const state = () => ({
   /** @type {KharonApp[]} */
@@ -77,7 +101,10 @@ export const mutations = {
    */
   addConfig(state, appCode) {
     // noinspection JSCheckFunctionSignatures
-    state.appConfigs[appCode] = new ElectronStore({name: `config-app-${appCode}`, schema: appConfigSchema})
+    state.appConfigs[appCode] = new ElectronStore({
+      name: `config-app-${appCode}`,
+      schema: appConfigSchema
+    })
   },
   setFetching(state, fetching) {
     state.isFetching = fetching
@@ -159,7 +186,7 @@ export const actions = {
    * @return {Promise<KharonApp>}
    */
   async getApp(state, id) {
-    return await this.$axios.$get(`/apps/${id}`)
+    return await this.$axios.$get(`${endpoint}/${id}`)
   },
 
   /**
@@ -179,7 +206,7 @@ export const actions = {
    * @return {Promise<*>}
    */
   async createApp(state, app) {
-    const resp = await this.$axios.$post('/apps/create', app)
+    const resp = await this.$axios.$post(`${endpoint}/create`, app)
     return resp.data
   },
 
@@ -202,7 +229,7 @@ export const actions = {
    * @return {Promise<*>}
    */
   async updateApp(state, app) {
-    const resp = await this.$axios.$put(`/apps/${app.id}`, app)
+    const resp = await this.$axios.$put(`${endpoint}/${app.id}`, app)
     return resp.data
   },
   /**
@@ -212,7 +239,7 @@ export const actions = {
    * @return {Promise<*>}
    */
   async deleteApp(state, appId) {
-    const resp = await this.$axios.$delete(`/apps/${appId}`)
+    const resp = await this.$axios.$delete(`${endpoint}/${appId}`)
     return resp.data
   },
   /**
@@ -223,8 +250,15 @@ export const actions = {
    * @param {string} changes
    * @return {Promise<*>}
    */
-  async addVersion(state, {appId, version, changes}) {
-    const resp = await this.$axios.$post(`/apps/${appId}/version`, {version, changes})
+  async addVersion(state, {
+    appId,
+    version,
+    changes
+  }) {
+    const resp = await this.$axios.$post(`${endpoint}/${appId}/version`, {
+      version,
+      changes
+    })
     return resp.date
   },
   /**
@@ -235,8 +269,15 @@ export const actions = {
    * @param {string} changes
    * @return {Promise<*>}
    */
-  async updateVersion(state, {appId, version, changes}) {
-    const resp = await this.$axios.$put(`/apps/${appId}/version`, {version, changes})
+  async updateVersion(state, {
+    appId,
+    version,
+    changes
+  }) {
+    const resp = await this.$axios.$put(`${endpoint}/${appId}/version`, {
+      version,
+      changes
+    })
     return resp.date
   },
   /**
@@ -246,8 +287,11 @@ export const actions = {
    * @param {string} version
    * @return {Promise<*>}
    */
-  async deleteVersion(state, {appId, version}) {
-    const resp = await this.$axios.$delete(`/apps/${appId}/version/${version}`)
+  async deleteVersion(state, {
+    appId,
+    version
+  }) {
+    const resp = await this.$axios.$delete(`${endpoint}/${appId}/version/${version}`)
     return resp.date
   },
   /**
@@ -257,12 +301,18 @@ export const actions = {
    * @param {string} versionCode
    * @return {Promise<any>}
    */
-  async downloadManifest(state, {app, versionCode}) {
+  async downloadManifest(state, {
+    app,
+    versionCode
+  }) {
     const baseUrl = `${app.rootPath}/${app.appCode}/${versionCode}`
     const manifestUrl = `${baseUrl}/manifest.json`
     return await this.$axios.$get(manifestUrl)
   },
-  async diffManifests(state, {oldManifest, newManifest}) {
+  async diffManifests(state, {
+    oldManifest,
+    newManifest
+  }) {
     return await ipcRenderer.invoke('manifest-diff', oldManifest, newManifest)
   },
 }

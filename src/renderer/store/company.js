@@ -8,7 +8,7 @@ export const state = () => ({
    */
   selectedCompany: null
 })
-
+const endpoint = '/api/companies'
 /**
  *
  * @typedef {Object} KharonCompany
@@ -99,7 +99,7 @@ export const actions = {
    * @return {Promise<KharonCompany>}
    */
   async fetchCompanyById(state, companyId) {
-    const resp = await this.$axios.$get(`/companies/${companyId}`)
+    const resp = await this.$axios.$get(`${endpoint}/${companyId}`)
     console.log('FETCH COMPANY', resp)
     state.commit('addCompany', resp)
     return resp
@@ -112,7 +112,7 @@ export const actions = {
   async fetchCompanies(state) {
     const isAdmin = state.rootGetters['user/isAdmin']
     if (isAdmin) {
-      const companies = await this.$axios.$get('/companies/')
+      const companies = await this.$axios.$get(endpoint)
       state.commit('setCompanies', companies)
       const getter = state.getters.getSelectedCompany
       await state.dispatch('selectCompany', companies.find(x => x.id === getter?.id))
@@ -137,7 +137,7 @@ export const actions = {
    * @return {Promise<*>}
    */
   async createCompany(state, company) {
-    const resp = await this.$axios.$post('/companies/create', company)
+    const resp = await this.$axios.$post('${endpoint}/create', company)
     await state.dispatch('fetchCompanies')
     return resp.data
   },
@@ -156,7 +156,7 @@ export const actions = {
    * @return {Promise<*>}
    */
   async updateCompany(state, company) {
-    const resp = await this.$axios.$put(`/companies/${company.id}`, company)
+    const resp = await this.$axios.$put(`${endpoint}/${company.id}`, company)
     await state.dispatch('fetchCompanies')
     return resp.data
   },
@@ -167,7 +167,7 @@ export const actions = {
    * @return {Promise<*>}
    */
   async deleteCompany(state, companyId) {
-    const resp = await this.$axios.$delete(`/companies/${companyId}`)
+    const resp = await this.$axios.$delete(`${endpoint}/${companyId}`)
     await state.dispatch('fetchCompanies')
     return resp.data
   },
