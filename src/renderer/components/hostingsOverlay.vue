@@ -122,9 +122,9 @@ export default {
     async showDialog(val) {
       this.dialog = val
       if (val) {
+        this.selectedHosting = null
         await this.fetchHostings()
-        this.selectHosting(this.hostings[0])
-        this.selectedHostingIndex = 0
+        this.selectFirst()
       }
     },
     dialog(val) {
@@ -160,12 +160,20 @@ export default {
     discard() {
       this.selectedHosting = JSON.parse(JSON.stringify(this.originalHosting))
     },
+    selectFirst() {
+      if (this.hostings.length === 0) {
+        this.selectedHostingIndex = null
+        this.selectedHosting = null
+        return
+      }
+      this.selectedHostingIndex = 0
+      this.selectHosting(this.hostings[0])
+    },
     async _delete() {
       if (this.selectedHosting.id) {
         await this.deleteHosting(this.selectedHosting.id)
         await this.fetchHostings()
-        this.selectHosting(this.hostings[0])
-        this.selectedHostingIndex = 0
+        this.selectFirst()
       }
     },
     async save() {
