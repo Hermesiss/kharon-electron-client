@@ -22,7 +22,18 @@ export default class Server {
       const {appId} = req.body
       this.launchApp(appId)
         .then(() => res.send('App started successfully'))
-        .catch(_ => res.status(500).send('Failed to start app'))
+        .catch(err => {
+          return res.status(500).send(`${err}`)
+        })
+    })
+
+    this.launcherApp.post('/api/app-close', (req, res) => {
+      const {appId} = req.body
+      this.closeApp(appId)
+        .then(() => res.send('App closed successfully'))
+        .catch(err => {
+          return res.status(500).send(`${err}`)
+        })
     })
   }
 
@@ -40,6 +51,19 @@ export default class Server {
         }
       })
       this.sendToRenderer('launch-app', appId)
+    })
+  }
+
+  closeApp(appId) {
+    return new Promise((resolve, reject) => {
+      ipcMain.once('close-app-return', (_, result, error) => {
+        if (result) {
+          resolve()
+        } else {
+          reject(error)
+        }
+      })
+      this.sendToRenderer('close-app', appId)
     })
   }
 

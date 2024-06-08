@@ -1,12 +1,22 @@
 const path = require('path')
 const childProcess = require('child_process')
 const fs = require('fs-extra')
-const {app, ipcMain, BrowserWindow, dialog, shell} = require('electron')
+const {
+  app,
+  ipcMain,
+  BrowserWindow,
+  dialog,
+  shell
+} = require('electron')
 const {download} = require('electron-dl')
 const fetch = require('electron-fetch').default
 const isDev = require('electron-is-dev')
 const ftp = require('basic-ftp')
-const {checkForUpdatesSelf, downloadSelf, installSelf} = require('./update/selfUpdater')
+const {
+  checkForUpdatesSelf,
+  downloadSelf,
+  installSelf
+} = require('./update/selfUpdater')
 
 /**
  *
@@ -131,7 +141,10 @@ ipcMain.handle('install-update', async () => {
   return installSelf()
 })
 
-const {generateManifest, diffManifests} = require('./update/fileComparer')
+const {
+  generateManifest,
+  diffManifests
+} = require('./update/fileComparer')
 
 ipcMain.handle('manifest-generate', async (event, directory, savePath, oldManifest, newVersion) => {
   const manifest = await generateManifest(directory, {
@@ -175,6 +188,18 @@ ipcMain.handle('manifest-generate', async (event, directory, savePath, oldManife
 
 ipcMain.handle('manifest-diff', async (event, oldManifest, newManifest) => {
   return await diffManifests(oldManifest, newManifest)
+})
+
+/**
+ * @param event
+ * @param {KharonApp} kharonApp
+ */
+ipcMain.handle('close', (event, kharonApp) => {
+  const appExePath = kharonApp.exePath
+  const appExeName = path.basename(appExePath)
+  const result = childProcess.execSync(`taskkill /IM ${appExeName} /F`).toString()
+  console.log(`App ${appExeName} closed with result: ${result}`)
+  return result
 })
 
 ipcMain.handle('launch',

@@ -131,6 +131,10 @@ export const actions = {
 
     context.commit('setFetching', true)
     const result = await ipcRenderer.invoke('check-update', '')
+    if (result === null) {
+      context.commit('setFetching', false)
+      return
+    }
     context.commit('setAvailableVersion', result.updateInfo.version)
     context.commit('setDownloadSize', result.updateInfo.files.reduce((a, x) => a + x.size, 0))
     context.commit('setFetching', false)

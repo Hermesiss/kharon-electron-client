@@ -19,9 +19,22 @@ export const actions = {
       await context.dispatch('settings/registerComputer', null, {root: true})
     })
     ipcRenderer.on('launch-app', async (_, appCode) => {
-      const app = await context.dispatch('app/getAppByCode', appCode, {root: true})
-      await context.dispatch('app/launchApp', app, {root: true})
-      ipcRenderer.send('launch-app-return', true)
+      try {
+        const app = await context.dispatch('app/getAppByCode', appCode, {root: true})
+        await context.dispatch('app/launchApp', app, {root: true})
+        ipcRenderer.send('launch-app-return', true)
+      } catch (error) {
+        ipcRenderer.send('launch-app-return', false, error)
+      }
+    })
+    ipcRenderer.on('close-app', async (_, appCode) => {
+      try {
+        const app = await context.dispatch('app/getAppByCode', appCode, {root: true})
+        await context.dispatch('app/closeApp', app, {root: true})
+        ipcRenderer.send('close-app-return', true)
+      } catch (error) {
+        ipcRenderer.send('close-app-return', false, error)
+      }
     })
     ipcRenderer.on('get-app-list', async () => {
       const apps = await context.dispatch('app/fetchApps', null, {root: true})

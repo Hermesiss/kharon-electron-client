@@ -51,6 +51,17 @@ const downloadSelf = async (onProgress, onStartDownload, onEndDownload) => {
 
 const checkForUpdatesSelf = async onFetchResult => {
   onFetchResultFunc = onFetchResult
-  return await autoUpdater.checkForUpdates()
+  try {
+    const active = autoUpdater.isUpdaterActive()
+    console.log('=== updater Active', active)
+    return await autoUpdater.checkForUpdates()
+  } catch (error) {
+    console.error('Error while checking for updates', error)
+    return null
+  }
 }
-module.exports = {checkForUpdatesSelf, downloadSelf, installSelf}
+module.exports = {
+  checkForUpdatesSelf,
+  downloadSelf,
+  installSelf
+}

@@ -156,6 +156,9 @@ export const actions = {
       this.$i18n.t('dialog.deleteApp.error.title'),
       this.$i18n.t('dialog.deleteApp.error.text'))
   },
+  async closeApp(context, kharonApp) {
+    await ipcRenderer.invoke('close', kharonApp)
+  },
   /**
    *
    * @param context
