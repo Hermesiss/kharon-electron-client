@@ -11,15 +11,14 @@ export default class Server {
     this.launcherApp = express()
     this.launcherApp.use(bodyParser.json())
 
-    this.launcherApp.get('/app-list', (_, res) => {
+    this.launcherApp.get('/api/app-list', (_, res) => {
       ipcMain.once('get-app-list-return', async (_, apps) => {
-        console.log('APPS', apps)
         res.send(apps)
       })
       this.sendToRenderer('get-app-list')
     })
 
-    this.launcherApp.post('/launch-app', (req, res) => {
+    this.launcherApp.post('/api/app-launch', (req, res) => {
       const {appId} = req.body
       this.launchApp(appId)
         .then(() => res.send('App started successfully'))

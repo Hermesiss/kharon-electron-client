@@ -144,8 +144,13 @@ export const actions = {
    * @return {Promise<void>}
    */
   async launchApp(context, kharonApp) {
-    const appConfig = context.state.appConfigs[kharonApp.appCode]
-    if (!appConfig || !appConfig.get('installedPath')) return
+    let appConfig = context.state.appConfigs[kharonApp.appCode]
+    if (!appConfig) {
+      context.commit('addConfig', kharonApp.appCode)
+      appConfig = context.state.appConfigs[kharonApp.appCode]
+    }
+    console.log('LAUNCHING', kharonApp, appConfig)
+    if (!appConfig.get('installedPath')) return
 
     await ipcRenderer.invoke('launch', kharonApp, appConfig.get('installedPath'),
       this.$i18n.t('dialog.deleteApp.error.title'),
@@ -202,7 +207,15 @@ export const actions = {
   async getApp(state, id) {
     return await this.$axios.$get(`${endpoint}/${id}`)
   },
-
+  /**
+   *
+   * @param state
+   * @param {string} code
+   * @return {Promise<KharonApp>}
+   */
+  async getAppByCode(state, code) {
+    return await this.$axios.$get(`${endpoint}/appcode/${code}`)
+  },
   /**
    * @typedef {object} AppCreateDTO
    * @property {string} appName

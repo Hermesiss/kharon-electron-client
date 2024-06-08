@@ -18,6 +18,11 @@ export const actions = {
     ipcRenderer.on('register-computer', async () => {
       await context.dispatch('settings/registerComputer', null, {root: true})
     })
+    ipcRenderer.on('launch-app', async (_, appCode) => {
+      const app = await context.dispatch('app/getAppByCode', appCode, {root: true})
+      await context.dispatch('app/launchApp', app, {root: true})
+      ipcRenderer.send('launch-app-return', true)
+    })
     ipcRenderer.on('get-app-list', async () => {
       const apps = await context.dispatch('app/fetchApps', null, {root: true})
       const installed = context.rootState.app.installedApps
@@ -30,12 +35,11 @@ export const actions = {
         const config = {
           appCode,
           installed: appConfigs[appCode].get('installed'),
-          version: appConfigs[appCode].get('version')
+          version: appConfigs[appCode].get('version'),
+          id: appConfigs[appCode].get('id')
         }
         configs.push(config)
       }
-
-      console.log('renderer APPS', apps)
       ipcRenderer.send('get-app-list-return', {
         configs
       })
