@@ -1,6 +1,7 @@
 /* eslint-disable */
 import {EventEmitter} from 'events'
 import {BrowserWindow, app} from 'electron'
+import Server from './server'
 
 const DEV_SERVER_URL = process.env.DEV_SERVER_URL
 const isProduction = process.env.NODE_ENV === 'production'
@@ -70,6 +71,9 @@ export default class BrowserWinHandler {
       this.browserWindow = null
     })
     this._eventEmitter.emit('created')
+
+    const serverInstance = new Server(this.browserWindow);
+    serverInstance.startServer();
   }
 
   _recreate() {

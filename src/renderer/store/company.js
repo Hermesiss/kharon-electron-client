@@ -137,7 +137,7 @@ export const actions = {
    * @return {Promise<*>}
    */
   async createCompany(state, company) {
-    const resp = await this.$axios.$post('${endpoint}/create', company)
+    const resp = await this.$axios.$post(`${endpoint}/create`, company)
     await state.dispatch('fetchCompanies')
     return resp.data
   },

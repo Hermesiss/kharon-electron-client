@@ -31,7 +31,7 @@
 <script>
 import fs from 'fs'
 import {ipcRenderer} from 'electron'
-import {mapActions, mapGetters, mapState} from 'vuex'
+import {mapActions, mapGetters, mapMutations, mapState} from 'vuex'
 import humanize from 'humanize'
 
 export default {
@@ -92,6 +92,10 @@ export default {
       downloadManifest: 'app/downloadManifest',
       fetchApps: 'app/fetchApps',
     }),
+    ...mapMutations({
+      addInstalledApp: 'app/addInstalledApp',
+      removeInstalledApp: 'app/removeInstalledApp',
+    }),
     /**
      * @param {KharonApp} app
      * @return {Promise<void>}
@@ -116,6 +120,7 @@ export default {
       appConfig.set('version', '0.0.0')
       console.log('Delete shortcuts')
       await ipcRenderer.invoke('shortcuts-delete', app, appPath)
+      this.removeInstalledApp(app.appCode)
       await this.fetchApps()
     },
     /**
@@ -152,6 +157,7 @@ export default {
       await ipcRenderer.invoke('shortcuts-create', app, appPath)
       this.showUploadProcess = false
       appConfig.set('downloaded', true)
+      this.addInstalledApp(app.appCode)
       await this.fetchApps()
     },
   }

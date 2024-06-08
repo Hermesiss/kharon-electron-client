@@ -94,6 +94,18 @@ export const mutations = {
   setSelectedApp(state, selectedApp) {
     state.selectedApp = selectedApp
   },
+  addInstalledApp(state, app) {
+    if (state.installedApps.some(x => x.id === app.id)) return
+    state.installedApps.push(app)
+    mainStore.set('apps', state.installedApps)
+  },
+  removeInstalledApp(state, app) {
+    const index = state.installedApps.findIndex(x => x.id === app.id)
+    if (index >= 0) {
+      state.installedApps.splice(index, 1)
+      mainStore.set('apps', state.installedApps)
+    }
+  },
   /**
    *
    * @param state
@@ -105,6 +117,7 @@ export const mutations = {
       name: `config-app-${appCode}`,
       schema: appConfigSchema
     })
+    return state.appConfigs[appCode]
   },
   setFetching(state, fetching) {
     state.isFetching = fetching
@@ -142,14 +155,14 @@ export const actions = {
    *
    * @param context
    * @param {string[]} [apps]
-   * @return {Promise<void>}
+   * @return {Promise<KharonApp[] | null>}
    */
   async fetchApps(context, apps) {
     if (!apps) {
       /** @type {KharonCompany} */
       const c = context.rootGetters['company/getSelectedCompany']
       if (!c) {
-        return
+        return null
       } else {
         apps = c.apps
       }
@@ -178,6 +191,7 @@ export const actions = {
     }
     context.commit('setApps', appArr)
     context.commit('setFetching', false)
+    return appArr
   },
   /**
    *
