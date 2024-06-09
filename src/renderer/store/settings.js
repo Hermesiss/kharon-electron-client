@@ -52,8 +52,9 @@ export const actions = {
     const data = {
       computerName: context.state.computerName,
       systemUUID: context.state.systemUUID,
-      port: context.rootState.server.port
+      port: context.rootState.server.port,
+      secure: false // set true if you are using https
     }
-    await this.$axios.$post('/api/computer', data)
+    await this.$axios.$post('/api/remote/register', data)
   },
 }

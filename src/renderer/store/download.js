@@ -22,7 +22,10 @@ export const state = () => ({
    */
 
   /** @type {AppToInstall}  */
-  appToInstall: {app: null, version: null},
+  appToInstall: {
+    app: null,
+    version: null
+  },
   /**
    * @typedef {Object} AppToDelete
    * @property {KharonApp | null} app
@@ -94,8 +97,14 @@ export const mutations = {
    * @param {KharonApp | null} app
    * @param {String | null} version
    */
-  setAppToInstall(state, {app, version}) {
-    state.appToInstall = {app, version}
+  setAppToInstall(state, {
+    app,
+    version
+  }) {
+    state.appToInstall = {
+      app,
+      version
+    }
   },
   /**
    *
@@ -120,7 +129,9 @@ export const actions = {
         context.commit('setDownloading', state)
       })
 
-      await context.dispatch('checkUpdate')
+      if (process.env.NODE_ENV !== 'development') {
+        await context.dispatch('checkUpdate')
+      }
 
       setInterval(() => context.dispatch('checkUpdate'), 300 * 1000)
     }
