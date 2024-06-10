@@ -14,7 +14,7 @@
     "preinstall": "node .electron-nuxt/check-engines.js",
     "postinstall": "electron-builder install-app-deps & yarn run lint:fix",
     "publish": "node .electron-nuxt/build.js --publish always",
-    "create-icons": "electron-icon-maker --input=./media/icon.png --output=./build/"
+    "create-icons": "electron-icon-maker --input=./src/main/media/icon.png --output=./build/"
   },
   "keywords": [],
   "author": "Hermesis <hermesiss@gmail.com>",

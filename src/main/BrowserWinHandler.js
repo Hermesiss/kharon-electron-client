@@ -1,16 +1,17 @@
 /* eslint-disable */
 import {EventEmitter} from 'events'
-import {BrowserWindow, app} from 'electron'
+import {BrowserWindow, app, Menu, Tray} from 'electron'
 import Server from './server'
+import path from 'path'
 
 const DEV_SERVER_URL = process.env.DEV_SERVER_URL
 const isProduction = process.env.NODE_ENV === 'production'
 const isDev = process.env.NODE_ENV === 'development'
-const windowStateKeeper = require('electron-window-state');
+const windowStateKeeper = require('electron-window-state')
 
-const Store = require('electron-store');
+const Store = require('electron-store')
 
-Store.initRenderer();
+Store.initRenderer()
 
 export default class BrowserWinHandler {
   /**
@@ -29,12 +30,18 @@ export default class BrowserWinHandler {
     // This method will be called when Electron has finished
     // initialization and is ready to create browser windows.
     // Some APIs can only be used after this event occurs.
-    if (app.isReady()) this._create()
-    else {
+    if (app.isReady()) {
+      this._create()
+    } else {
       app.once('ready', () => {
         this._create()
+        this._createTray()
       })
     }
+
+    app.on('window-all-closed', (event) => {
+      event.preventDefault()
+    })
 
     // On macOS it's common to re-create a window in the app when the
     // dock icon is clicked and there are no other windows open.
@@ -46,7 +53,7 @@ export default class BrowserWinHandler {
     let mainWindowState = windowStateKeeper({
       defaultWidth: 1920,
       defaultHeight: 1080
-    });
+    })
 
     this.browserWindow = new BrowserWindow(
       {
@@ -66,14 +73,26 @@ export default class BrowserWinHandler {
 
     mainWindowState.manage(this.browserWindow)
 
+    const mainWindow = this.browserWindow
+
+    this.browserWindow.on('close', function (event) {
+      console.log('close')
+      console.log('app.isQuiting', app.isQuiting)
+      if (!app.isQuiting) {
+        event.preventDefault()
+        mainWindow.hide()
+      }
+      return false
+    })
+
     this.browserWindow.on('closed', () => {
       // Dereference the window object
       this.browserWindow = null
     })
     this._eventEmitter.emit('created')
 
-    const serverInstance = new Server(this.browserWindow);
-    serverInstance.startServer();
+    const serverInstance = new Server(this.browserWindow)
+    serverInstance.startServer()
   }
 
   _recreate() {
@@ -90,7 +109,7 @@ export default class BrowserWinHandler {
    * @param callback {onReadyCallback}
    */
   onCreated(callback) {
-    if (this.browserWindow !== null) return callback(this.browserWindow);
+    if (this.browserWindow !== null) return callback(this.browserWindow)
     this._eventEmitter.once('created', () => {
       callback(this.browserWindow)
     })
@@ -99,7 +118,7 @@ export default class BrowserWinHandler {
   async loadPage(pagePath) {
     if (!this.browserWindow) return Promise.reject(new Error('The page could not be loaded before win \'created\' event'))
     const serverUrl = isDev ? DEV_SERVER_URL : 'app://./index.html'
-    const fullPath = serverUrl + '#' + pagePath;
+    const fullPath = serverUrl + '#' + pagePath
     await this.browserWindow.loadURL(fullPath)
   }
 
@@ -111,5 +130,35 @@ export default class BrowserWinHandler {
     return new Promise(resolve => {
       this.onCreated(() => resolve(this.browserWindow))
     })
+  }
+
+  _createTray() {
+    const image = path.join(__dirname, 'media', 'icon.png')
+    this.tray = new Tray(image)
+
+    const mainWindow = this.browserWindow
+
+    const contextMenu = Menu.buildFromTemplate([
+      {
+        label: 'Show App',
+        click: function () {
+          mainWindow.show()
+        }
+      },
+      {
+        label: 'Quit',
+        click: function () {
+          app.isQuiting = true
+          app.quit()
+        }
+      }
+    ])
+
+    this.tray.setToolTip('Kharon launcher')
+    this.tray.setContextMenu(contextMenu)
+
+    this.tray.on('click', function () {
+      mainWindow.isVisible() ? mainWindow.hide() : mainWindow.show();
+    });
   }
 }
