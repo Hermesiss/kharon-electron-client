@@ -1,6 +1,6 @@
 /* eslint-disable */
 import {EventEmitter} from 'events'
-import {BrowserWindow, app, Menu, Tray, dialog} from 'electron'
+import {BrowserWindow, app, Menu, Tray} from 'electron'
 import Server from './server'
 import path from 'path'
 
@@ -142,10 +142,6 @@ export default class BrowserWinHandler {
       const dir = path.dirname(app.getPath("exe"));
       image = path.join(dir, 'resources', 'media', 'icon.png');
     }
-    dialog.showMessageBoxSync({
-      message: "Image path: " + image
-    })
-    console.log("Image path: ", image)
     this.tray = new Tray(image)
 
     const mainWindow = this.browserWindow

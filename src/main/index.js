@@ -1,6 +1,7 @@
 const path = require('path')
 const childProcess = require('child_process')
 const fs = require('fs-extra')
+const originalFs = require('original-fs')
 const {
   app,
   ipcMain,
@@ -56,6 +57,7 @@ ipcMain.handle('upload-ftp', async (event, params) => {
   const ftpPath = params.ftpPath
   const manifest = params.manifest
   const selectedPath = params.selectedPath
+  const asarFiles = []
 
   const client = new ftp.Client()
   client.ftp.verbose = true
@@ -84,13 +86,20 @@ ipcMain.handle('upload-ftp', async (event, params) => {
     const manifestLength = actualFiles.length
     for (let i = 0; i < manifestLength; i++) {
       const manifestElement = actualFiles[i]
-      const from = path.join(selectedPath, manifestElement.filePath)
+      let from = path.join(selectedPath, manifestElement.filePath)
+      const ext = path.extname(from)
+      if (ext === '.asar') {
+        originalFs.copyFileSync(from, from + '.asar_tmp')
+        from = from + '.asar_tmp'
+        asarFiles.push(from)
+      }
       const to = [remoteDirPath, manifestElement.filePath].join('/').replace(/\\/g, '/')
       const toDir = path.dirname(to)
       console.log(manifestElement, from, to, toDir)
 
       try {
         await client.ensureDir(toDir)
+
         await client.uploadFrom(from, to)
         console.log(`UPDATED ${i + 1} from ${manifestLength}`)
         uploadedBytes += manifestElement.fileSize
@@ -112,8 +121,12 @@ ipcMain.handle('upload-ftp', async (event, params) => {
     isSuccess = true
   } catch (err) {
     console.log('UPLOAD ERROR', err)
+    dialog.showErrorBox('FTP Upload Error', err.message)
   } finally {
     client.close()
+    for (const asarFile of asarFiles) {
+      originalFs.unlinkSync(asarFile)
+    }
   }
 
   return isSuccess
@@ -180,8 +193,8 @@ ipcMain.handle('manifest-generate', async (event, directory, savePath, oldManife
     const dirname = path.dirname(savePath)
     console.log('DIRNAME', dirname)
     fs.ensureDirSync(dirname)
-    fs.writeFileSync(savePath, JSON.stringify(manifest))
-    fs.writeFileSync(path.join(dirname, 'diff.json'), JSON.stringify(diff))
+    originalFs.writeFileSync(savePath, JSON.stringify(manifest))
+    originalFs.writeFileSync(path.join(dirname, 'diff.json'), JSON.stringify(diff))
   }
   return manifest
 })
@@ -214,7 +227,7 @@ ipcMain.handle('launch',
    */
   async (event, kharonApp, appPath, errorTitle, errorText) => {
     const exePath = path.join(appPath, kharonApp.exePath)
-    if (!fs.existsSync(exePath)) {
+    if (!originalFs.existsSync(exePath)) {
       dialog.showErrorBox(errorTitle, `${exePath}: ${errorText}`)
     }
     console.log('LAUNCHING', exePath)
@@ -250,7 +263,7 @@ ipcMain.handle('shortcuts-delete',
    */
   async (event, kharonApp, appPath) => {
     const shortcut = path.join(app.getPath('home'), 'Desktop', `${kharonApp.appName}.lnk`)
-    if (!fs.existsSync(shortcut)) {
+    if (!originalFs.existsSync(shortcut)) {
       console.log('SHORTCUT', shortcut, 'not exists, cannot delete')
       return
     }
@@ -278,13 +291,13 @@ ipcMain.handle('download-app', async (event, manifest, app, filePath, diff) => {
         const to = path.resolve(filePath, toElement)
         const dir = path.dirname(to)
         fs.ensureDirSync(dir)
-        fs.copyFileSync(from, to)
+        originalFs.copyFileSync(from, to)
       }
-      fs.unlinkSync(from)
+      originalFs.unlinkSync(from)
     }
     for (const missingFile of diff.missingFiles) {
       const from = path.resolve(filePath, missingFile.filePath)
-      fs.unlinkSync(from)
+      originalFs.unlinkSync(from)
     }
     filesForDownload = manifest.files.filter(x => diff.newFiles.some(z => z.filePath === x.filePath) ||
       diff.changedFiles.some(z => z.filePath === x.filePath)
@@ -304,8 +317,8 @@ ipcMain.handle('download-app', async (event, manifest, app, filePath, diff) => {
     const baseUrl = `${app.rootPath}/${app.appCode}/${version}`
     const url = `${baseUrl}/${manifestElement.filePath}`
     const fullLocalPath = path.resolve(filePath, manifestElement.filePath)
-    if (fs.existsSync(fullLocalPath)) {
-      fs.unlinkSync(fullLocalPath)
+    if (originalFs.existsSync(fullLocalPath)) {
+      originalFs.unlinkSync(fullLocalPath)
     }
 
     console.log(`Downloading from ${url}`)
@@ -323,6 +336,10 @@ ipcMain.handle('download-app', async (event, manifest, app, filePath, diff) => {
         sendToRenderer('app-download-progress', currentProgress)
       },
     })
+    if (fullLocalPath.endsWith('.asar.asar_tmp')) {
+      const newName = fullLocalPath.replace('.asar.asar_tmp', '.asar')
+      originalFs.renameSync(fullLocalPath, newName)
+    }
     downloaded += manifestElement.fileSize
   }
 })
