@@ -1,6 +1,6 @@
 /* eslint-disable */
 import {EventEmitter} from 'events'
-import {BrowserWindow, app, Menu, Tray} from 'electron'
+import {BrowserWindow, app, Menu, Tray, dialog} from 'electron'
 import Server from './server'
 import path from 'path'
 
@@ -39,9 +39,9 @@ export default class BrowserWinHandler {
       })
     }
 
-    app.on('window-all-closed', (event) => {
+/*     app.on('window-all-closed', (event) => {
       event.preventDefault()
-    })
+    }) */
 
     // On macOS it's common to re-create a window in the app when the
     // dock icon is clicked and there are no other windows open.
@@ -133,7 +133,19 @@ export default class BrowserWinHandler {
   }
 
   _createTray() {
-    const image = path.join(__dirname, 'media', 'icon.png')
+    const isDev = process.env.NODE_ENV === 'development'
+    console.log("isDev: ", isDev)
+    let image
+    if (isDev) {
+      image = path.join(__dirname, '../extraResources', 'media', 'icon.png');
+    }else{
+      const dir = path.dirname(app.getPath("exe"));
+      image = path.join(dir, 'resources', 'media', 'icon.png');
+    }
+    dialog.showMessageBoxSync({
+      message: "Image path: " + image
+    })
+    console.log("Image path: ", image)
     this.tray = new Tray(image)
 
     const mainWindow = this.browserWindow

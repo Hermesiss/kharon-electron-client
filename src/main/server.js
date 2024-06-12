@@ -1,7 +1,7 @@
 import {execSync} from 'child_process'
 import express from 'express'
 import bodyParser from 'body-parser'
-import {BrowserWindow, ipcMain} from 'electron'
+import {ipcMain} from 'electron'
 
 const PORTS = [4000, 4001, 4002]
 
