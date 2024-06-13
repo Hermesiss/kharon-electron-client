@@ -103,6 +103,7 @@
     "ftp-password": "Ftp password",
     "language": "Language",
     "logout": "Log out",
+    "exit": "Exit",
     "management": "Management",
     "title": "Settings",
     "computerName": "Computer name"

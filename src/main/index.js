@@ -49,6 +49,12 @@ ipcMain.handle('get-folder', async () => {
   return await dialog.showOpenDialog({properties: ['openDirectory']})
 })
 
+ipcMain.handle('exit-app', () => {
+  console.log('Exiting app')
+  app.isQuiting = true
+  app.quit()
+})
+
 ipcMain.handle('upload-ftp', async (event, params) => {
   console.log('starting ftp with params', params)
 

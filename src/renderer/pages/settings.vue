@@ -24,6 +24,10 @@
             <v-spacer/>
             <v-btn color="warning" @click="logout"> {{ $t('settings.logout') }}</v-btn>
           </v-card-actions>
+          <v-card-actions>
+            <v-spacer/>
+            <v-btn color="error" @click="exit"> {{ $t('settings.exit') }}</v-btn>
+          </v-card-actions>
         </v-card>
         <v-card v-if="false" class="my-4">
           <v-card-title>{{ $t('settings.management') }}</v-card-title>
@@ -57,7 +61,7 @@
 </template>
 
 <script>
-import {mapGetters, mapMutations, mapState} from 'vuex'
+import {mapActions, mapGetters, mapMutations, mapState} from 'vuex'
 import UpdateChecker from '../components/updateChecker'
 
 export default {
@@ -112,6 +116,12 @@ export default {
       setCompanies: 'company/setCompanies',
       setUsers: 'user/setUsers'
     }),
+    ...mapActions({
+      exitApp: 'settings/exitApp'
+    }),
+    async exit() {
+      await this.exitApp()
+    },
     async logout() {
       try {
         await this.$auth.logout('local')

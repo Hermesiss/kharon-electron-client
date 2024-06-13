@@ -1,5 +1,6 @@
 import {execSync} from 'child_process'
 import ElectronStore from 'electron-store'
+import {ipcRenderer} from 'electron'
 
 function getSystemUUID() {
   try {
@@ -57,4 +58,8 @@ export const actions = {
     }
     await this.$axios.$post('/api/remote/register', data)
   },
+  async exitApp() {
+    console.log('Exit app')
+    await ipcRenderer.invoke('exit-app')
+  }
 }

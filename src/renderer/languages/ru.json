@@ -103,6 +103,7 @@
     "ftp-password": "FTP пароль",
     "language": "Язык",
     "logout": "Выйти из аккаунта",
+    "exit": "Закрыть приложение",
     "management": "Управление",
     "title": "Настройки",
     "computerName": "Имя компьютера"

@@ -48,13 +48,17 @@
                           path="/settings" :badge-value="!isActual"
                           badge-color="accent"
         />
+        <drawer-list-item caption="settings.exit" icon="mdi-close"
+                          color="#f4745a"
+                          @click="exit"
+        />
       </v-list>
     </template>
   </v-navigation-drawer>
 </template>
 
 <script>
-import {mapGetters} from 'vuex'
+import {mapActions, mapGetters} from 'vuex'
 import DrawerListItem from '~/components/drawer/drawerListItem'
 
 export default {
@@ -103,7 +107,15 @@ export default {
           return 'mdi-account'
       }
     },
-  }
+  },
+  methods: {
+    ...mapActions({
+      exitApp: 'settings/exitApp'
+    }),
+    async exit() {
+      await this.exitApp()
+    },
+  },
 }
 </script>
 

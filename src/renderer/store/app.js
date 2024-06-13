@@ -94,13 +94,26 @@ export const mutations = {
   setSelectedApp(state, selectedApp) {
     state.selectedApp = selectedApp
   },
+  /**
+   *
+   * @param state
+   * @param {string} app
+   */
   addInstalledApp(state, app) {
-    if (state.installedApps.some(x => x.id === app.id)) return
+    if (state.installedApps.includes(app)) {
+      console.log('app already installed')
+      return
+    }
     state.installedApps.push(app)
     mainStore.set('apps', state.installedApps)
   },
+  /**
+   *
+   * @param state
+   * @param {string} app
+   */
   removeInstalledApp(state, app) {
-    const index = state.installedApps.findIndex(x => x.id === app.id)
+    const index = state.installedApps.findIndex(x => x === app)
     if (index >= 0) {
       state.installedApps.splice(index, 1)
       mainStore.set('apps', state.installedApps)
