@@ -215,10 +215,49 @@ ipcMain.handle('manifest-diff', async (event, oldManifest, newManifest) => {
  */
 ipcMain.handle('close', (event, kharonApp) => {
   const appExePath = kharonApp.exePath
-  const appExeName = path.basename(appExePath)
-  const result = childProcess.execSync(`taskkill /IM ${appExeName} /F`).toString()
-  console.log(`App ${appExeName} closed with result: ${result}`)
-  return result
+  const appExeName = path.basename(appExePath).replace('.exe', '') // TODO windows only
+
+  try {
+    const psCommand = `
+      $mainProcess = Get-Process -Name "${appExeName}" -ErrorAction SilentlyContinue;
+      if ($mainProcess) {
+        $childProcesses = Get-WmiObject Win32_Process | Where-Object { $_.ParentProcessId -eq $mainProcess.Id };
+        $processIds = @($mainProcess.Id) + $childProcesses | ForEach-Object { $_.ProcessId };
+        $processIds -join ","
+      } else {
+        "Process not found"
+      }
+    `
+
+    const result = childProcess.spawnSync('powershell.exe', ['-Command', psCommand], {encoding: 'utf-8'})
+
+    if (result.error) {
+      console.error('Failed to execute PowerShell command', result.error)
+      return 'Failed to execute PowerShell command'
+    } else {
+      const output = result.stdout.trim()
+      if (output === 'Process not found') {
+        console.log('Process not found')
+        return 'Process not found'
+      } else {
+        const processIds = output.split(',').map(id => id.trim()).filter(id => id)
+        console.log('Process IDs:', processIds)
+        processIds.forEach(pid => {
+          try {
+            const killResult = childProcess.execSync(`taskkill /PID ${pid} /F`).toString()
+            console.log(`Successfully killed process with PID: ${pid} - ${killResult}`)
+          } catch (error) {
+            console.error(`Failed to kill process with PID: ${pid}`, error)
+          }
+        })
+
+        return `Processes with PIDs ${processIds.join(', ')} closed successfully.`
+      }
+    }
+  } catch (e) {
+    console.error(`Error closing app ${appExeName}: ${e}`)
+    return `Error closing app ${appExeName}: ${e}`
+  }
 })
 
 ipcMain.handle('launch',
