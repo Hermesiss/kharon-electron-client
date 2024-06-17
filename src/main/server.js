@@ -43,7 +43,7 @@ export default class Server {
       console.log('Creating window')
       this.websiteWindow = new BrowserWindow({
         fullscreen: true,
-        alwaysOnTop: true,
+        kiosk: true,
         autoHideMenuBar: true,
         webPreferences: {
           nodeIntegration: false
