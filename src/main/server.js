@@ -5,12 +5,25 @@ import {BrowserWindow, ipcMain} from 'electron'
 const PORTS = [4000, 4001, 4002]
 
 export default class Server {
+  async closeAllApps() {
+    for (const [appId, {type}] of this.launchedApps) {
+      if (type === 'app') {
+        await this.closeApp(appId)
+      } else if (type === 'website') {
+        await this.closeWebsite()
+      }
+    }
+    this.launchedApps.clear()
+  }
+
   constructor(window) {
     this.window = window
     /** @type {Electron.BrowserWindow | null} */
     this.websiteWindow = null
     this.launcherApp = express()
     this.launcherApp.use(bodyParser.json())
+    /** @type {Map<string,{type: 'app'|'website'}>} */
+    this.launchedApps = new Map()
 
     this.launcherApp.get('/api/app-list', (_, res) => {
       ipcMain.once('get-app-list-return', async (_, apps) => {
@@ -39,27 +52,23 @@ export default class Server {
 
     this.launcherApp.post('/api/website-launch', (req, res) => {
       const {website} = req.body
-      console.log('Launching website', website)
-      console.log('Creating window')
-      this.websiteWindow = new BrowserWindow({
-        fullscreen: true,
-        kiosk: true,
-        autoHideMenuBar: true,
-        webPreferences: {
-          nodeIntegration: false
-        }
-      })
-      console.log('Loading website')
-      this.websiteWindow.loadURL(website)
-      res.send('Website launched successfully')
+      this.launchWebsite(website).then(
+        () => res.send('Website launched successfully'),
+        err => res.status(500).send(`${err}`)
+      )
     })
 
     this.launcherApp.post('/api/website-close', (req, res) => {
-      if (this.websiteWindow) {
-        this.websiteWindow.close()
-        this.websiteWindow = null
-      }
-      res.send('Website closed successfully')
+      this.closeWebsite().then(
+        () => res.send('Website closed successfully'),
+        err => res.status(500).send(`${err}`))
+    })
+
+    this.launcherApp.post('/api/close-all', (req, res) => {
+      console.log('Closing all apps')
+      this.closeAllApps().then(
+        () => res.send('All apps closed successfully'),
+        err => res.status(500).send(`${err}`))
     })
   }
 
@@ -67,10 +76,38 @@ export default class Server {
     this.window.webContents.send(channel, ...args)
   }
 
-  launchApp(appId) {
+  async launchWebsite(website) {
+    if (this.launchedApps.size > 0) {
+      await this.closeAllApps()
+    }
+    this.websiteWindow = new BrowserWindow({
+      fullscreen: true,
+      kiosk: true,
+      autoHideMenuBar: true,
+      webPreferences: {
+        nodeIntegration: false
+      }
+    })
+    this.launchedApps.set(website, {type: 'website'})
+    await this.websiteWindow.loadURL(website)
+  }
+
+  async closeWebsite() {
+    if (this.websiteWindow) {
+      this.websiteWindow.close()
+      this.websiteWindow = null
+    }
+  }
+
+  async launchApp(appId) {
+    if (this.launchedApps.size > 0) {
+      await this.closeAllApps()
+    }
+    const server = this
     return new Promise((resolve, reject) => {
       ipcMain.once('launch-app-return', (_, result, error) => {
         if (result) {
+          server.launchedApps.set(appId, {type: 'app'})
           resolve()
         } else {
           reject(error)
@@ -81,9 +118,11 @@ export default class Server {
   }
 
   closeApp(appId) {
+    const server = this
     return new Promise((resolve, reject) => {
       ipcMain.once('close-app-return', (_, result, error) => {
         if (result) {
+          server.launchedApps.delete(appId)
           resolve()
         } else {
           reject(error)
