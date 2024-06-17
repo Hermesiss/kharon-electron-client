@@ -1,13 +1,14 @@
-import {execSync} from 'child_process'
 import express from 'express'
 import bodyParser from 'body-parser'
-import {ipcMain} from 'electron'
+import {BrowserWindow, ipcMain} from 'electron'
 
 const PORTS = [4000, 4001, 4002]
 
 export default class Server {
   constructor(window) {
     this.window = window
+    /** @type {Electron.BrowserWindow | null} */
+    this.websiteWindow = null
     this.launcherApp = express()
     this.launcherApp.use(bodyParser.json())
 
@@ -34,6 +35,31 @@ export default class Server {
         .catch(err => {
           return res.status(500).send(`${err}`)
         })
+    })
+
+    this.launcherApp.post('/api/website-launch', (req, res) => {
+      const {website} = req.body
+      console.log('Launching website', website)
+      console.log('Creating window')
+      this.websiteWindow = new BrowserWindow({
+        fullscreen: true,
+        alwaysOnTop: true,
+        autoHideMenuBar: true,
+        webPreferences: {
+          nodeIntegration: false
+        }
+      })
+      console.log('Loading website')
+      this.websiteWindow.loadURL(website)
+      res.send('Website launched successfully')
+    })
+
+    this.launcherApp.post('/api/website-close', (req, res) => {
+      if (this.websiteWindow) {
+        this.websiteWindow.close()
+        this.websiteWindow = null
+      }
+      res.send('Website closed successfully')
     })
   }
 

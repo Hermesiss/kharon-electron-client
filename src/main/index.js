@@ -10,7 +10,6 @@ const {
   shell
 } = require('electron')
 const {download} = require('electron-dl')
-const fetch = require('electron-fetch').default
 const isDev = require('electron-is-dev')
 const ftp = require('basic-ftp')
 const {
@@ -215,14 +214,18 @@ ipcMain.handle('manifest-diff', async (event, oldManifest, newManifest) => {
  */
 ipcMain.handle('close', (event, kharonApp) => {
   const appExePath = kharonApp.exePath
-  const appExeName = path.basename(appExePath).replace('.exe', '') // TODO windows only
+  const appFileName = path.basename(appExePath)
+  const appExeName = appFileName.replace('.exe', '') // TODO windows only
+  console.log('Closing app', appExeName)
+
+  const errors = []
 
   try {
     const psCommand = `
       $mainProcess = Get-Process -Name "${appExeName}" -ErrorAction SilentlyContinue;
       if ($mainProcess) {
         $childProcesses = Get-WmiObject Win32_Process | Where-Object { $_.ParentProcessId -eq $mainProcess.Id };
-        $processIds = @($mainProcess.Id) + $childProcesses | ForEach-Object { $_.ProcessId };
+        $processIds = @($mainProcess.ProcessId) + $childProcesses | ForEach-Object { $_.ProcessId };
         $processIds -join ","
       } else {
         "Process not found"
@@ -240,17 +243,30 @@ ipcMain.handle('close', (event, kharonApp) => {
         console.log('Process not found')
         return 'Process not found'
       } else {
+        console.log('Output:', output)
         const processIds = output.split(',').map(id => id.trim()).filter(id => id)
         console.log('Process IDs:', processIds)
         processIds.forEach(pid => {
           try {
             const killResult = childProcess.execSync(`taskkill /PID ${pid} /F`).toString()
-            console.log(`Successfully killed process with PID: ${pid} - ${killResult}`)
+            console.log(`Successfully killed child process with PID: ${pid} - ${killResult}`)
           } catch (error) {
+            errors.push(error)
             console.error(`Failed to kill process with PID: ${pid}`, error)
           }
         })
 
+        try {
+          const killResult = childProcess.execSync(`taskkill  /IM ${appFileName} /F`).toString()
+          console.log(`Successfully killed main process with name: ${appFileName} - ${killResult}`)
+        } catch (error) {
+          errors.push(error)
+          console.error(`Failed to kill main process with name: ${appFileName}`, error)
+        }
+
+        if (errors.length > 0) {
+          return `Error closing app ${appFileName}: ${errors.map(e => e.message).join(', ')}`
+        }
         return `Processes with PIDs ${processIds.join(', ')} closed successfully.`
       }
     }
