@@ -37,6 +37,10 @@ let onProgressFunc
 let onStartDownloadFunc
 let onEndDownloadFunc
 
+const changeUpdateServer = options => {
+  autoUpdater.setFeedURL(options)
+}
+
 const installSelf = () => {
   setImmediate(() => autoUpdater.quitAndInstall())
 }
@@ -63,5 +67,6 @@ const checkForUpdatesSelf = async onFetchResult => {
 module.exports = {
   checkForUpdatesSelf,
   downloadSelf,
-  installSelf
+  installSelf,
+  changeUpdateServer
 }

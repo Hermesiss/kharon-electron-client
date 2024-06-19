@@ -1,7 +1,32 @@
 const path = require('path')
 const ICONS_DIR = 'build/icons/'
 
-require('dotenv').config()
+require('dotenv').config({ path: path.resolve(__dirname, 'build.env') })
+
+let publishConfig = null
+
+const provider = process.env.PUBLISH_PROVIDER
+
+console.log('PUBLISH_PROVIDER', provider)
+
+if (provider === 'github') {
+  publishConfig = {
+    provider: 'github',
+    repo: 'kharon-electron-client', // TODO - get from env
+    owner: 'hermesiss', // TODO - get from env
+    private: false, // TODO - get from env
+    releaseType: 'release', // TODO - get from env
+    token: process.env.GH_TOKEN,
+    publisherName: [],
+    verifyUpdateCodeSignature: false
+  }
+} else if (provider === 'generic') {
+  publishConfig = {
+    provider: 'generic',
+    url: process.env.PUBLISH_URL,
+    publisherName: []
+  }
+}
 
 const windowsOS = {
   win: {
@@ -10,16 +35,7 @@ const windowsOS = {
     target: 'nsis',
     requestedExecutionLevel: 'highestAvailable',
     publish: [
-      {
-        provider: 'github',
-        repo: 'kharon-electron-client',
-        owner: 'hermesiss',
-        private: false,
-        releaseType: 'release',
-        token: process.env.GH_TOKEN,
-        publisherName: [],
-        verifyUpdateCodeSignature: false
-      }
+      publishConfig
     ]
   },
 
