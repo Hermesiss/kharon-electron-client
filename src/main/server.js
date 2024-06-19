@@ -51,8 +51,11 @@ export default class Server {
     })
 
     this.launcherApp.post('/api/website-launch', (req, res) => {
-      const {website} = req.body
-      this.launchWebsite(website).then(
+      const {
+        website,
+        zoomFactor
+      } = req.body
+      this.launchWebsite(website, zoomFactor).then(
         () => res.send('Website launched successfully'),
         err => res.status(500).send(`${err}`)
       )
@@ -76,7 +79,7 @@ export default class Server {
     this.window.webContents.send(channel, ...args)
   }
 
-  async launchWebsite(website) {
+  async launchWebsite(website, zoom = 1) {
     if (this.launchedApps.size > 0) {
       await this.closeAllApps()
     }
@@ -88,6 +91,8 @@ export default class Server {
         nodeIntegration: false
       }
     })
+    console.log(`Launching website ${website} with zoom factor ${zoom}`)
+    this.websiteWindow.webContents.setZoomFactor(zoom)
     this.launchedApps.set(website, {type: 'website'})
     await this.websiteWindow.loadURL(website)
   }
