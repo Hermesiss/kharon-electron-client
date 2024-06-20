@@ -27,11 +27,17 @@ export default class BrowserWinHandler {
   }
 
   _createInstance() {
+    const gotTheLock = app.requestSingleInstanceLock();
+    if (!gotTheLock) {
+      app.quit();
+      return
+    }
     // This method will be called when Electron has finished
     // initialization and is ready to create browser windows.
     // Some APIs can only be used after this event occurs.
     if (app.isReady()) {
       this._create()
+      this._createTray()
     } else {
       app.once('ready', () => {
         this._create()
@@ -149,6 +155,13 @@ export default class BrowserWinHandler {
     this.tray = new Tray(image)
 
     const mainWindow = this.browserWindow
+
+    app.on('second-instance', (event, commandLine, workingDirectory) => {
+      if (mainWindow) {
+        if (mainWindow.isMinimized()) mainWindow.restore();
+        mainWindow.show();
+      }
+    });
 
     const contextMenu = Menu.buildFromTemplate([
       {
