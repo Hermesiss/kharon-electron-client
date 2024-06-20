@@ -23,6 +23,10 @@ const settingsSchema = {
     type: 'string',
     default: 'user_pc'
   },
+  username: {
+    type: 'string',
+    default: ' '
+  }
 }
 
 const settingsStore = new ElectronStore({
@@ -34,6 +38,7 @@ const ftpPasswordKey = 'ftpPassword'
 export const state = () => ({
   ftpPwd: settingsStore.get(ftpPasswordKey),
   computerName: settingsStore.get('computerName'),
+  username: settingsStore.get('username'),
   systemUUID: getSystemUUID()
 })
 
@@ -45,6 +50,9 @@ export const mutations = {
   setComputerName(state, name) {
     settingsStore.set('computerName', name)
     state.computerName = name
+  },
+  setUsername(state, username) {
+    settingsStore.set('username', username)
   }
 }
 
@@ -61,5 +69,9 @@ export const actions = {
   async exitApp() {
     console.log('Exit app')
     await ipcRenderer.invoke('exit-app')
+  },
+  async reloadApp() {
+    console.log('Reload app')
+    await ipcRenderer.invoke('reload-app')
   }
 }

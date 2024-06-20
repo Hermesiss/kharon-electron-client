@@ -49,6 +49,10 @@ export default class BrowserWinHandler {
     app.on('activate', () => this._recreate())
   }
 
+  reload() {
+    this.browserWindow.reload()
+  }
+
   _create() {
     let mainWindowState = windowStateKeeper({
       defaultWidth: 1920,

@@ -41,8 +41,13 @@ app.on('browser-window-created', (event, win) => {
   if (!isDev) win.removeMenu()
 })
 
+const {
+  generateManifest,
+  diffManifests
+} = require('./update/fileComparer')
+
 // Load here all startup windows
-require('./mainWindow')
+const mainWindow = require('./mainWindow').default
 
 ipcMain.handle('get-folder', async () => {
   return await dialog.showOpenDialog({properties: ['openDirectory']})
@@ -52,6 +57,10 @@ ipcMain.handle('exit-app', () => {
   console.log('Exiting app')
   app.isQuiting = true
   app.quit()
+})
+
+ipcMain.handle('reload-app', () => {
+  mainWindow.reload()
 })
 
 ipcMain.handle('upload-ftp', async (event, params) => {
@@ -158,11 +167,6 @@ ipcMain.handle('download-update', async () => {
 ipcMain.handle('install-update', async () => {
   return installSelf()
 })
-
-const {
-  generateManifest,
-  diffManifests
-} = require('./update/fileComparer')
 
 ipcMain.handle('manifest-generate', async (event, directory, savePath, oldManifest, newVersion) => {
   const manifest = await generateManifest(directory, {

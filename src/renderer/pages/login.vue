@@ -34,7 +34,7 @@
 </template>
 
 <script>
-import {mapMutations} from 'vuex'
+import {mapGetters, mapMutations, mapState} from 'vuex'
 
 export default {
   name: 'Login',
@@ -48,12 +48,23 @@ export default {
       computerName: ''
     }
   },
+  computed: {
+    ...mapState({
+      compName: state => state.settings.computerName,
+      username: state => state.settings.username
+    })
+  },
+  mounted() {
+    this.computerName = this.compName
+    this.login.username = this.username
+  },
   methods: {
     ...mapMutations({
       startProgress: 'overlay/startProgress',
       stopProgress: 'overlay/stopProgress',
       showError: 'notifications/showError',
       setComputerName: 'settings/setComputerName',
+      setUsername: 'settings/setUsername'
     }),
     async userLogin() {
       try {
@@ -61,6 +72,7 @@ export default {
         const result = await this.$auth.loginWith('local', {data: this.login})
         console.log('RESULT:', result)
         this.setComputerName(this.computerName)
+        this.setUsername(this.login.username)
         await this.$router.push('/')
       } catch (err) {
 

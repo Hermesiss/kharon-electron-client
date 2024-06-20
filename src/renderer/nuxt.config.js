@@ -7,7 +7,7 @@
 require('dotenv').config()
 
 module.exports = {
-  router: {middleware: ['auth']},
+  router: {middleware: ['pingServer', 'auth']},
   auth: {
     strategies: {
       local: {
@@ -24,7 +24,7 @@ module.exports = {
         endpoints: {
           login: {url: '/api/users/authenticate', method: 'post'},
           logout: false,
-          user: {url: '/api/users/current', method: 'get'},
+          user: false // {url: '/api/users/current', method: 'get'},
         }
       },
     }

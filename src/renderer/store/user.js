@@ -88,6 +88,11 @@ export const mutations = {
 }
 
 export const actions = {
+  async fetchCurrentUser(state) {
+    const user = await this.$axios.$get(`${endpoint}/current`)
+    this.$auth.setUser(user);
+    return user
+  },
   async fetchUsers(state) {
     const resp = await this.$axios.$get(endpoint)
     console.log('USERS', resp)

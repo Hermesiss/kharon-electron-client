@@ -35,12 +35,14 @@ export default {
       selectedApp: state => state.app.selectedApp
     })
   },
-  mounted() {
-    this.fetchCompanies()
+  async mounted() {
+    await this.fetchCurrentUser()
+    await this.fetchCompanies()
   },
   methods: {
     ...mapActions({
-      fetchCompanies: 'company/fetchCompanies'
+      fetchCompanies: 'company/fetchCompanies',
+      fetchCurrentUser: 'user/fetchCurrentUser'
     }),
     /**
      *

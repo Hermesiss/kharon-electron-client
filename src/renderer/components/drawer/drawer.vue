@@ -1,14 +1,15 @@
 <template>
-  <v-navigation-drawer v-if="isLogged"
-                       v-model="drawer"
-                       :mini-variant="mini"
-                       permanent
-                       app
-                       class="pa-0"
+  <v-navigation-drawer
+    v-model="drawer"
+    :mini-variant="mini"
+    permanent
+    app
+    class="pa-0"
   >
-    <v-layout column fill-height>
+    <!--  Top buttons  -->
+    <v-layout v-if="isLogged" column fill-height>
       <v-list class="fill-height pa-0">
-        <v-list-item class="px-2">
+        <v-list-item v-if="isLogged" class="px-2">
           <v-list-item-avatar @click.stop="mini? (mini= !mini) : null">
             <v-icon>{{ userIcon }}</v-icon>
           </v-list-item-avatar>
@@ -44,7 +45,8 @@
                           :path="page.path"
         />
 
-        <drawer-list-item caption="settings.title" icon="mdi-cog"
+        <drawer-list-item v-if="isLogged" caption="settings.title"
+                          icon="mdi-cog"
                           path="/settings" :badge-value="!isActual"
                           badge-color="accent"
         />
@@ -69,11 +71,25 @@ export default {
       drawer: false,
       mini: false,
       pages: [
-        {path: '/', icon: 'mdi-home', captionKey: 'home.title'},
-        {path: '/users', icon: 'mdi-account-group', captionKey: 'users.title', rolesOnly: ['owner', 'admin']},
+        {
+          path: '/',
+          icon: 'mdi-home',
+          captionKey: 'home.title',
+        },
+        {
+          path: '/users',
+          icon: 'mdi-account-group',
+          captionKey: 'users.title',
+          rolesOnly: ['owner', 'admin']
+        },
       ],
       bottomPages: [
-        {path: '/debug', icon: 'mdi-hammer-wrench', captionKey: 'debug.title', rolesOnly: ['admin']},
+        {
+          path: '/debug',
+          icon: 'mdi-hammer-wrench',
+          captionKey: 'debug.title',
+          rolesOnly: ['admin']
+        },
         // {path: '/settings', icon: 'mdi-cog', captionKey: 'settings.title'}
       ],
     }
