@@ -14,6 +14,7 @@ export default class Server {
       }
     }
     this.launchedApps.clear()
+    await new Promise(resolve => setTimeout(resolve, 1000));
   }
 
   constructor(window) {
@@ -95,6 +96,7 @@ export default class Server {
     this.websiteWindow.webContents.setZoomFactor(zoom)
     this.launchedApps.set(website, {type: 'website'})
     await this.websiteWindow.loadURL(website)
+    this.websiteWindow.webContents.setZoomFactor(zoom)
   }
 
   async closeWebsite() {
