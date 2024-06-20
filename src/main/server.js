@@ -1,6 +1,7 @@
 import express from 'express'
 import bodyParser from 'body-parser'
 import {BrowserWindow, ipcMain} from 'electron'
+import loudness from 'loudness'
 
 const PORTS = [4000, 4001, 4002]
 
@@ -14,7 +15,7 @@ export default class Server {
       }
     }
     this.launchedApps.clear()
-    await new Promise(resolve => setTimeout(resolve, 1000));
+    await new Promise(resolve => setTimeout(resolve, 1000))
   }
 
   constructor(window) {
@@ -25,6 +26,27 @@ export default class Server {
     this.launcherApp.use(bodyParser.json())
     /** @type {Map<string,{type: 'app'|'website'}>} */
     this.launchedApps = new Map()
+
+    this.launcherApp.get('/api/volume', async (_, res) => {
+      const data = {
+        volume: await loudness.getVolume(),
+        muted: await loudness.getMuted()
+      }
+
+      res.send(data)
+    })
+
+    this.launcherApp.post('/api/volume', async (req, res) => {
+      const volume = req.body.volume
+      if (volume !== undefined) {
+        await loudness.setVolume(volume)
+      }
+      const muted = req.body.muted
+      if (muted !== undefined) {
+        await loudness.setMuted(muted)
+      }
+      res.send('Volume set successfully')
+    })
 
     this.launcherApp.get('/api/app-list', (_, res) => {
       ipcMain.once('get-app-list-return', async (_, apps) => {

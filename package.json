@@ -1,6 +1,6 @@
 {
   "name": "kharon-electron-client",
-  "version": "0.4.2",
+  "version": "0.4.4",
   "description": "Kharon game and app launcher",
   "main": "./dist/main/index.js",
   "scripts": {
@@ -80,6 +80,7 @@
     "ftp-service": "^2.0.0",
     "humanize": "^0.0.9",
     "js-yaml": "^4.1.0",
+    "loudness": "^0.4.2",
     "md5-file": "^5.0.0",
     "semver": "^7.3.5",
     "vue-i18n": "^8.26.7",

@@ -6536,7 +6536,7 @@ execa@^0.7.0:
     signal-exit "^3.0.0"
     strip-eof "^1.0.0"
 
-execa@^4.0.0:
+execa@^4.0.0, execa@^4.0.3:
   version "4.1.0"
   resolved "https://registry.yarnpkg.com/execa/-/execa-4.1.0.tgz#4e5491ad1572f2f17a77d388c6c857135b22847a"
   integrity sha512-j5W0//W7f8UxAn8hXVnwG8tLwdiUy4FJLcSupCg6maBYZDpyBvTApK7KyuI4bKj8KOh1r2YH+6ucuYtJv1bTZA==
@@ -9274,6 +9274,13 @@ loud-rejection@^2.1.0:
   dependencies:
     currently-unhandled "^0.4.1"
     signal-exit "^3.0.2"
+
+loudness@^0.4.2:
+  version "0.4.2"
+  resolved "https://registry.yarnpkg.com/loudness/-/loudness-0.4.2.tgz#86ed11e69c259ef577b58beb428061deb0a0f7ac"
+  integrity sha512-D+1opqDjcpAdyv0JVt5KJju/4f6yLs/tqcDj8LCrtZciYMtD4I2I4brByt9nZkfU5bnnnHsLFPtBBDpv2oamkg==
+  dependencies:
+    execa "^4.0.3"
 
 lower-case@^1.1.1:
   version "1.1.4"
