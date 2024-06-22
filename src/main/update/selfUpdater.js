@@ -54,6 +54,7 @@ const downloadSelf = async (onProgress, onStartDownload, onEndDownload) => {
 }
 
 const checkForUpdatesSelf = async onFetchResult => {
+  if (process.env.NODE_ENV === 'development') return null
   onFetchResultFunc = onFetchResult
   try {
     const active = autoUpdater.isUpdaterActive()

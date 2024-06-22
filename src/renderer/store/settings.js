@@ -26,6 +26,10 @@ const settingsSchema = {
   username: {
     type: 'string',
     default: ' '
+  },
+  autoLaunch: {
+    type: 'boolean',
+    default: true
   }
 }
 
@@ -38,6 +42,7 @@ const ftpPasswordKey = 'ftpPassword'
 export const state = () => ({
   ftpPwd: settingsStore.get(ftpPasswordKey),
   computerName: settingsStore.get('computerName'),
+  autoLaunch: settingsStore.get('autoLaunch'),
   username: settingsStore.get('username'),
   systemUUID: getSystemUUID()
 })
@@ -53,10 +58,19 @@ export const mutations = {
   },
   setUsername(state, username) {
     settingsStore.set('username', username)
+  },
+  setAutoLaunch(state, autoLaunch) {
+    state.autoLaunch = autoLaunch
+    settingsStore.set('autoLaunch', autoLaunch)
+    ipcRenderer.send('auto-launch', autoLaunch)
   }
 }
 
 export const actions = {
+  async initStore(context) {
+    const autoLaunch = context.state.autoLaunch
+    context.commit('setAutoLaunch', autoLaunch)
+  },
   async registerComputer(context) {
     const data = {
       computerName: context.state.computerName,
@@ -73,5 +87,10 @@ export const actions = {
   async reloadApp() {
     console.log('Reload app')
     await ipcRenderer.invoke('reload-app')
+  },
+  async getAutoLaunch(context) {
+    const state = await ipcRenderer.invoke('auto-launch-status')
+    context.state.autoLaunch = state
+    return state
   }
 }

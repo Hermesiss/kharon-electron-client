@@ -106,7 +106,8 @@
     "exit": "Закрыть приложение",
     "management": "Управление",
     "title": "Настройки",
-    "computerName": "Имя компьютера"
+    "computerName": "Имя компьютера",
+    "autoLaunch": "Автозапуск"
   },
   "updater": {
     "subtitle": {

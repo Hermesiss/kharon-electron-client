@@ -30,12 +30,13 @@ export default {
   mounted() {
     this.initStore()
     this.initServerStore()
+    this.initSettings()
   },
   methods: {
     ...mapActions({
       initStore: 'download/initStore',
       initServerStore: 'server/initStore',
-      registerComputer: 'settings/registerComputer',
+      initSettings: 'settings/initStore'
     })
   }
 }

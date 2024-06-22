@@ -17,6 +17,9 @@ const {
   downloadSelf,
   installSelf
 } = require('./update/selfUpdater')
+const autoLaunch = require('./modules/autoLaunch')
+
+autoLaunch.configure()
 
 /**
  *

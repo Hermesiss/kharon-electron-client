@@ -17,6 +17,7 @@
               <v-select v-model="currentLocale" :label="$t('settings.language')"
                         :items="availableLocales" item-text="name" item-value="code"
               />
+              <v-checkbox v-model="autoLaunch" :label="$t('settings.autoLaunch')"/>
               <update-checker/>
             </v-list>
           </v-card-text>
@@ -75,7 +76,8 @@ export default {
   computed: {
     ...mapState({
       ftpPwd: state => state.settings.ftpPwd,
-      compName: state => state.settings.computerName
+      compName: state => state.settings.computerName,
+      autoLnch: state => state.settings.autoLaunch
     }),
     ...mapGetters({
       isAdmin: 'user/isAdmin'
@@ -107,6 +109,17 @@ export default {
         this.$i18n.setLocale(newValue)
       }
     },
+    autoLaunch: {
+      get() {
+        return this.autoLnch
+      },
+      set(newValue) {
+        this.setAutoLaunch(newValue)
+      }
+    }
+  },
+  mounted() {
+    this.getAutoLaunch()
   },
   methods: {
     ...mapMutations({
@@ -114,10 +127,12 @@ export default {
       setComputerName: 'settings/setComputerName',
       setApps: 'app/setApps',
       setCompanies: 'company/setCompanies',
-      setUsers: 'user/setUsers'
+      setUsers: 'user/setUsers',
+      setAutoLaunch: 'settings/setAutoLaunch'
     }),
     ...mapActions({
-      exitApp: 'settings/exitApp'
+      exitApp: 'settings/exitApp',
+      getAutoLaunch: 'settings/getAutoLaunch'
     }),
     async exit() {
       await this.exitApp()

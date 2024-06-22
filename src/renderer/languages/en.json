@@ -106,7 +106,8 @@
     "exit": "Exit",
     "management": "Management",
     "title": "Settings",
-    "computerName": "Computer name"
+    "computerName": "Computer name",
+    "autoLaunch": "Auto launch"
   },
   "updater": {
     "subtitle": {
