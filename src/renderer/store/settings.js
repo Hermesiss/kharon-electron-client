@@ -25,7 +25,7 @@ const settingsSchema = {
   },
   username: {
     type: 'string',
-    default: ' '
+    default: ''
   },
   autoLaunch: {
     type: 'boolean',

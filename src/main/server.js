@@ -1,3 +1,4 @@
+import {exec, execSync} from 'child_process'
 import express from 'express'
 import bodyParser from 'body-parser'
 import {BrowserWindow, ipcMain} from 'electron'
@@ -15,6 +16,7 @@ export default class Server {
       }
     }
     this.launchedApps.clear()
+    await this.closeWebsiteExternal()
     await new Promise(resolve => setTimeout(resolve, 1000))
   }
 
@@ -78,14 +80,14 @@ export default class Server {
         website,
         zoomFactor
       } = req.body
-      this.launchWebsite(website, zoomFactor).then(
+      this.launchWebsiteExternal(website, zoomFactor).then(
         () => res.send('Website launched successfully'),
         err => res.status(500).send(`${err}`)
       )
     })
 
     this.launcherApp.post('/api/website-close', (req, res) => {
-      this.closeWebsite().then(
+      this.closeWebsiteExternal().then(
         () => res.send('Website closed successfully'),
         err => res.status(500).send(`${err}`))
     })
@@ -100,6 +102,21 @@ export default class Server {
 
   sendToRenderer(channel, ...args) {
     this.window.webContents.send(channel, ...args)
+  }
+
+  async launchWebsiteExternal(website, zoom = 1) {
+    if (this.launchedApps.size > 0) {
+      await this.closeAllApps()
+    }
+
+    await this.closeWebsiteExternal()
+
+    const command = `start chrome  --kiosk --incognito ${website} --force-device-scale-factor=${zoom}`
+    exec(command)
+  }
+
+  async closeWebsiteExternal() {
+    execSync('taskkill /IM chrome.exe /F')
   }
 
   async launchWebsite(website, zoom = 1) {
