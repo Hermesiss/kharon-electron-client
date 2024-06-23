@@ -38,13 +38,13 @@
     </v-layout>
     <template #append>
       <v-list>
+        <update-checker/>
         <drawer-list-item v-for="page in getBottomPages"
                           :key="page.path"
                           :caption="page.captionKey"
                           :icon="page.icon"
                           :path="page.path"
         />
-
         <drawer-list-item v-if="isLogged" caption="settings.title"
                           icon="mdi-cog"
                           path="/settings" :badge-value="!isActual"
@@ -62,10 +62,14 @@
 <script>
 import {mapActions, mapGetters} from 'vuex'
 import DrawerListItem from '~/components/drawer/drawerListItem'
+import UpdateChecker from '~/components/updateChecker.vue'
 
 export default {
   name: 'Drawer',
-  components: {DrawerListItem},
+  components: {
+    UpdateChecker,
+    DrawerListItem
+  },
   data() {
     return {
       drawer: false,
