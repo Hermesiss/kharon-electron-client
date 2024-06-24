@@ -101,8 +101,12 @@ export default class BrowserWinHandler {
     })
     this._eventEmitter.emit('created')
 
-    const serverInstance = new Server(this.browserWindow)
-    serverInstance.startServer()
+    this.browserWindow.once('ready-to-show', () => {
+      mainWindow.minimize();
+    });
+
+    this.serverInstance = new Server(this.browserWindow)
+    this.serverInstance.startServer()
   }
 
   _recreate() {

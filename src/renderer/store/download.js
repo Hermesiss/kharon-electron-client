@@ -55,6 +55,7 @@ export const mutations = {
   setInstalledVersion(state, version) {
     version = semver.clean(version)
     state.installedVersion = version
+    state.availableVersion = version
   },
   /**
    *
@@ -133,12 +134,12 @@ export const actions = {
         await context.dispatch('checkUpdate')
       }
 
-      setInterval(() => context.dispatch('checkUpdate'), 300 * 1000)
+      setInterval(() => context.dispatch('checkUpdate'), 60 * 1000)
     }
   },
   async checkUpdate(context) {
     const currentState = context.getters.currentUpdateState
-    if (currentState !== UpdateState.Actual) return
+    if (currentState !== UpdateState.Actual && currentState !== UpdateState.NewAvailable) return
 
     context.commit('setFetching', true)
     const result = await ipcRenderer.invoke('check-update', '')

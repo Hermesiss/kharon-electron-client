@@ -111,12 +111,21 @@ export default class Server {
 
     await this.closeWebsiteExternal()
 
-    const command = `start chrome  --kiosk --incognito ${website} --force-device-scale-factor=${zoom}`
+    const chromePath = 'c:/Program Files/Google/Chrome/Application/chrome.exe'
+    console.log(`Chrome path: ${chromePath}`)
+    console.log(`Launching website ${website} with zoom factor ${zoom}`)
+
+    const command = ` "${chromePath}"  --kiosk --incognito ${website} --force-device-scale-factor=${zoom}`
+    console.log(`Command:\n${command}`)
     exec(command)
   }
 
   async closeWebsiteExternal() {
-    execSync('taskkill /IM chrome.exe /F')
+    try {
+      execSync('taskkill /IM chrome.exe /F')
+    } catch (e) {
+      console.error(e)
+    }
   }
 
   async launchWebsite(website, zoom = 1) {

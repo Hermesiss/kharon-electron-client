@@ -38,7 +38,7 @@
     </v-layout>
     <template #append>
       <v-list>
-        <update-checker/>
+        <update-checker v-if="!isActual"/>
         <drawer-list-item v-for="page in getBottomPages"
                           :key="page.path"
                           :caption="page.captionKey"
