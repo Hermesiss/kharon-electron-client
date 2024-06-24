@@ -135,6 +135,7 @@ export const actions = {
       }
 
       setInterval(() => context.dispatch('checkUpdate'), 60 * 1000)
+      await context.dispatch('checkUpdate')
     }
   },
   async checkUpdate(context) {

@@ -31,12 +31,14 @@ export default {
     this.initStore()
     this.initServerStore()
     this.initSettings()
+    this.initNotifications()
   },
   methods: {
     ...mapActions({
       initStore: 'download/initStore',
       initServerStore: 'server/initStore',
-      initSettings: 'settings/initStore'
+      initSettings: 'settings/initStore',
+      initNotifications: 'notifications/initStore'
     })
   }
 }

@@ -1,7 +1,8 @@
-const {dialog} = require('electron')
-const isDev = require('electron-is-dev')
+import isDev from 'electron-is-dev'
 
-const {autoUpdater} = require('electron-updater')
+import {autoUpdater} from 'electron-updater'
+import {KharonNotification} from '../../common/KharonNotification'
+import {sendToRenderer} from '../utils'
 
 autoUpdater.autoDownload = false
 autoUpdater.allowDowngrade = true
@@ -11,7 +12,12 @@ if (isDev) {
 }
 
 autoUpdater.on('error', error => {
-  dialog.showErrorBox('Error: ', error == null ? 'unknown' : (error.stack || error).toString())
+  console.error('Error while checking for updates', error)
+  const notification = new KharonNotification('Update fetch error\n' + error, {
+    mode: 'error',
+    timeout: 10000
+  })
+  sendToRenderer('notification', notification)
 })
 
 autoUpdater.on('update-available', async () => {
@@ -54,7 +60,6 @@ const downloadSelf = async (onProgress, onStartDownload, onEndDownload) => {
 }
 
 const checkForUpdatesSelf = async onFetchResult => {
-  if (process.env.NODE_ENV === 'development') return null
   onFetchResultFunc = onFetchResult
   try {
     const active = autoUpdater.isUpdaterActive()
@@ -65,7 +70,8 @@ const checkForUpdatesSelf = async onFetchResult => {
     return null
   }
 }
-module.exports = {
+
+export default {
   checkForUpdatesSelf,
   downloadSelf,
   installSelf,

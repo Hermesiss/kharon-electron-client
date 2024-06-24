@@ -12,26 +12,15 @@ const {
 const {download} = require('electron-dl')
 const isDev = require('electron-is-dev')
 const ftp = require('basic-ftp')
+const {sendToRenderer} = require('./utils.js')
 const {
   checkForUpdatesSelf,
   downloadSelf,
   installSelf
-} = require('./update/selfUpdater')
+} = require('./update/selfUpdater').default
 const autoLaunch = require('./modules/autoLaunch')
 
 autoLaunch.configure()
-
-/**
- *
- * @param channel
- * @param args
- */
-function sendToRenderer(channel, ...args) {
-  const win = BrowserWindow.getAllWindows()[0]
-  if (!win) return
-
-  win.webContents.send(channel, ...args)
-}
 
 // Quit when all windows are closed.
 app.on('window-all-closed', function () {

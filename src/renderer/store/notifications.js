@@ -1,4 +1,5 @@
-let increment = 0
+import {ipcRenderer} from 'electron'
+import {KharonNotification} from '../../common/KharonNotification'
 
 const getText = (err, app) => {
   // simple error
@@ -18,24 +19,6 @@ const getText = (err, app) => {
 
   // standard error
   return err.message ?? err
-}
-
-export class KharonNotification {
-  /**
-   *
-   * @param {string} content
-   * @param {string | number} [id]
-   * @param {'info' | 'success' | 'warning' | 'error' | 'primary' } [mode]
-   * @param {number} [timeout]
-   * @param {boolean} [dismissible]
-   */
-  constructor(content, {id = increment++, mode = 'primary', timeout = -1, dismissible = true} = {}) {
-    this.content = content
-    this.mode = mode
-    this.timeout = timeout
-    this.dismissible = timeout <= 0 ? true : dismissible
-    this.id = id
-  }
 }
 
 export const state = () => ({
@@ -67,8 +50,25 @@ export const mutations = {
     const app = this
     const text = getText(err, app)
 
-    const notification = new KharonNotification(text, {mode: 'error', timeout: 10000})
+    const notification = new KharonNotification(text, {
+      mode: 'error',
+      timeout: 10000
+    })
 
-    this.commit('notifications/showNotification', notification)
+    this.commit('showNotification', notification)
+  }
+}
+
+export const actions = {
+  initStore(context) {
+    ipcRenderer.on('notification',
+      /**
+       * @param {Electron.IpcRendererEvent} event
+       * @param {KharonNotification} notification
+       */
+      (event, notification) => {
+        console.log('notification', notification)
+        context.commit('showNotification', notification)
+      })
   }
 }
