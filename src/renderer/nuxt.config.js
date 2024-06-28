@@ -7,6 +7,9 @@
 require('dotenv').config()
 
 module.exports = {
+  css: [
+    '@mdi/font/css/materialdesignicons.css'
+  ],
   router: {middleware: ['pingServer', 'auth']},
   auth: {
     strategies: {
@@ -22,7 +25,10 @@ module.exports = {
           autoFetch: true
         },
         endpoints: {
-          login: {url: '/api/users/authenticate', method: 'post'},
+          login: {
+            url: '/api/users/authenticate',
+            method: 'post'
+          },
           logout: false,
           user: false // {url: '/api/users/current', method: 'get'},
         }
@@ -37,7 +43,10 @@ module.exports = {
   },
   loading: false,
   plugins: [
-    {ssr: true, src: '@/plugins/icons.js'},
+    {
+      ssr: true,
+      src: '@/plugins/icons.js'
+    },
     '@/plugins/axios'
   ],
   build: {
@@ -55,8 +64,18 @@ module.exports = {
   ],
   i18n: {
     locales: [
-      {code: 'en', iso: 'en-US', file: 'en.json', name: 'English'},
-      {code: 'ru', iso: 'ru-RU', file: 'ru.json', name: 'Русский'}
+      {
+        code: 'en',
+        iso: 'en-US',
+        file: 'en.json',
+        name: 'English'
+      },
+      {
+        code: 'ru',
+        iso: 'ru-RU',
+        file: 'ru.json',
+        name: 'Русский'
+      }
     ],
     langDir: 'languages/',
     defaultLocale: 'en',
@@ -65,7 +84,10 @@ module.exports = {
       fallbackLocale: 'en',
       redirectOn: 'all',
     },
-    vuex: {moduleName: 'i18n', syncRouteParams: true},
+    vuex: {
+      moduleName: 'i18n',
+      syncRouteParams: true
+    },
     strategy: 'no_prefix'
   },
   axios: {
@@ -76,6 +98,12 @@ module.exports = {
   vuetify: {
     customVariables: ['~/assets/variables.scss'],
     treeShake: true,
+    defaultAssets: {
+      font: {
+        family: 'Roboto'
+      },
+      icons: 'mdi'
+    },
     theme: {
       dark: false,
       themes: {

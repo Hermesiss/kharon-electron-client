@@ -38,7 +38,6 @@
                                 required :rules="rules.required"
                                 placeholder="apps"
                   />
-
                 </v-card-text>
                 <v-card-actions>
                   <v-btn color="error" :disabled="!deletable" @click="_delete">

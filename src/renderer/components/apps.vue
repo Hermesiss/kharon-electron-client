@@ -65,7 +65,8 @@
                         :label="$t('company.company')"
                         required :rules="rules.required"
               />
-              <h3>Deploy
+              <h3>
+                Deploy
                 <v-btn x-small @click="showDialog = true">From hostings</v-btn>
               </h3>
               <HostingsOverlay :show-dialog.sync="showDialog" @select="selectHosting"/>

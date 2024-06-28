@@ -45,7 +45,6 @@ export const mutations = {
    */
   setAvailableVersion(state, version) {
     version = semver.clean(version)
-    state.availableVersion = version
   },
   /**
    *

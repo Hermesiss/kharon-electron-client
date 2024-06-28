@@ -1,6 +1,6 @@
 export default async function ({$axios, redirect, error}) {
   let serverIsOnline = false
-  const maxRetries = 100
+  const maxRetries = 10000
   let retries = 0
 
   while (!serverIsOnline) {
