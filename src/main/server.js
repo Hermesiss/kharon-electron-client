@@ -2,7 +2,8 @@ import {exec, execSync} from 'child_process'
 import express from 'express'
 import bodyParser from 'body-parser'
 import {BrowserWindow, ipcMain} from 'electron'
-import loudness from 'loudness'
+// import loudness from 'loudness'
+import loudness from 'mwl-loudness'
 
 const PORTS = [4000, 4001, 4002]
 

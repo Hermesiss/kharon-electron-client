@@ -4,6 +4,7 @@ const yaml = require("js-yaml")
 const fs = require("fs");
 
 const removePublishers = async (context) => {
+  console.log("Removing publishers from app-update.yml...");
   const filePath = path.join(path.join(context.appOutDir, 'resources'), 'app-update.yml');
 
   try {

@@ -3,6 +3,9 @@ const ICONS_DIR = 'build/icons/'
 
 require('dotenv').config({ path: path.resolve(__dirname, 'build.env') })
 
+const removePublishers = require('./.electron-nuxt/remove-publishers')
+const copyVolumeFiles = require('./.electron-nuxt/copy-volume-files')
+
 let publishConfig = null
 
 const provider = process.env.PUBLISH_PROVIDER
@@ -80,7 +83,10 @@ module.exports = {
   appId: 'com.kharon.client',
   // eslint-disable-next-line no-template-curly-in-string
   artifactName: 'setup-${version}.${ext}',
-  afterPack: '.electron-nuxt/remove-publishers.js',
+  afterPack: async context => {
+    await removePublishers.default(context)
+    await copyVolumeFiles.default(context)
+  },
   directories: {
     output: 'dist/publish'
   },
