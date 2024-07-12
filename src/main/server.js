@@ -31,24 +31,38 @@ export default class Server {
     this.launchedApps = new Map()
 
     this.launcherApp.get('/api/volume', async (_, res) => {
-      const data = {
-        volume: await loudness.getVolume(),
-        muted: await loudness.getMuted()
+      let data
+      try {
+        data = {
+          volume: await loudness.getVolume(),
+          muted: await loudness.getMuted()
+        }
+      } catch (e) {
+        console.error(e)
+        data = {
+          volume: 0,
+          muted: false
+        }
       }
 
       res.send(data)
     })
 
     this.launcherApp.post('/api/volume', async (req, res) => {
-      const volume = req.body.volume
-      if (volume !== undefined) {
-        await loudness.setVolume(volume)
+      try {
+        const volume = req.body.volume
+        if (volume !== undefined) {
+          await loudness.setVolume(volume)
+        }
+        const muted = req.body.muted
+        if (muted !== undefined) {
+          await loudness.setMuted(muted)
+        }
+        res.send('Volume set successfully')
+      } catch (e) {
+        console.error(e)
+        res.send('Error setting volume')
       }
-      const muted = req.body.muted
-      if (muted !== undefined) {
-        await loudness.setMuted(muted)
-      }
-      res.send('Volume set successfully')
     })
 
     this.launcherApp.get('/api/app-list', (_, res) => {

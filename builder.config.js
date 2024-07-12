@@ -1,7 +1,7 @@
 const path = require('path')
 const ICONS_DIR = 'build/icons/'
 
-require('dotenv').config({ path: path.resolve(__dirname, 'build.env') })
+require('dotenv').config({path: path.resolve(__dirname, 'build.env')})
 
 const removePublishers = require('./.electron-nuxt/remove-publishers')
 const copyVolumeFiles = require('./.electron-nuxt/copy-volume-files')

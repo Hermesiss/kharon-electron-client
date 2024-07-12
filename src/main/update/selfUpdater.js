@@ -59,12 +59,22 @@ const downloadSelf = async (onProgress, onStartDownload, onEndDownload) => {
   await autoUpdater.downloadUpdate()
 }
 
+/**
+ *
+ * @param onFetchResult
+ * @return {Promise<UpdateCheckResult|null>}
+ */
 const checkForUpdatesSelf = async onFetchResult => {
   onFetchResultFunc = onFetchResult
+  if (process.env.NODE_ENV === 'development') {
+    const url = `${process.env.DEBUG_URL}/ftp/launcher`
+    autoUpdater.setFeedURL(url)
+  }
+
   try {
-    const active = autoUpdater.isUpdaterActive()
-    console.log('=== updater Active', active)
-    return await autoUpdater.checkForUpdates()
+    const result = await autoUpdater.checkForUpdates()
+    console.log('checkForUpdatesSelf result', result)
+    return result
   } catch (error) {
     console.error('Error while checking for updates', error)
     return null

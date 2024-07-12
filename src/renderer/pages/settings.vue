@@ -107,6 +107,7 @@ export default {
       },
       set(newValue) {
         this.$i18n.setLocale(newValue)
+        this.$i18n.setLocaleCookie(newValue)
       }
     },
     autoLaunch: {

@@ -143,6 +143,7 @@ export const actions = {
 
     context.commit('setFetching', true)
     const result = await ipcRenderer.invoke('check-update', '')
+    console.log('checkUpdate', result)
     if (result === null) {
       context.commit('setFetching', false)
       return
@@ -163,6 +164,7 @@ export const actions = {
   async getInstalledVersion(context) {
     const version = process.env.NODE_ENV === 'development' ? '0.0.1' : await ipcRenderer.invoke('get-version')
     context.commit('setInstalledVersion', version)
+    console.log('getInstalledVersion', version)
     return version
   }
 }
